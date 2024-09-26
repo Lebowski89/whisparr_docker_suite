@@ -1,0 +1,78 @@
+---
+
+- name: Register whisparr rclone qbittorrent volume
+  community.docker.docker_volume_info:
+    name: '{{ whisparr_rclone_qbittorrent_name }}'
+  register: whisparr_rclone_qbittorrent_initial_volume_result
+
+- name: Perform rclone docker volume creation tasks
+  when: not whisparr_rclone_qbittorrent_initial_volume_result.exists
+  block:
+    - name: Install FUSE driver prerequisite
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: fuse
+
+    - name: Create two directories required by rclone docker plugin
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: '{{ whisparr_rclone_docker_plugin_env_puid }}'
+        group: '{{ whisparr_rclone_docker_plugin_env_pgid }}'
+        mode: '0755'
+      loop:
+        - '/var/lib/docker-plugins/rclone/config'
+        - '/var/lib/docker-plugins/rclone/cache'
+
+    - name: Install docker volume rclone plugin
+      community.docker.docker_plugin:
+        plugin_name: rclone/docker-volume-rclone:latest
+        alias: 'rclone'
+        state: present
+
+    - name: Disable docker volume rclone plugin
+      community.docker.docker_plugin:
+        plugin_name: rclone
+        state: disable
+
+    - name: Apply rclone docker plugin global arguments
+      ansible.builtin.command: 'docker plugin set rclone RCLONE_VERBOSE=2 args={{ whisparr_rclone_docker_plugin_global_args | quote }}'
+
+    - name: Enable docker volume rclone plugin
+      community.docker.docker_plugin:
+        plugin_name: rclone
+        debug: true
+        state: enable
+
+    - name: Check if rclone.conf exists
+      ansible.builtin.stat:
+        path: /var/lib/docker-plugins/rclone/config/rclone.conf
+      register: rclone_config_result
+
+    - name: Create rclone.conf file
+      when: not rclone_config_result.stat.exists
+      ansible.builtin.file:
+        path: /var/lib/docker-plugins/rclone/config/rclone.conf
+        state: touch
+        owner: '{{ whisparr_rclone_docker_plugin_env_puid }}'
+        group: '{{ whisparr_rclone_docker_plugin_env_pgid }}'
+        mode: '0644'
+
+    - name: Create sftp rclone qbittorrent volume
+      community.docker.docker_volume:
+        name: '{{ whisparr_rclone_qbittorrent_name }}'
+        driver: rclone
+        driver_options:
+          type: '{{ whisparr_rclone_qbittorrent_type }}'
+          path: '{{ whisparr_rclone_qbittorrent_mount_path }}'
+          sftp-host: '{{ whisparr_rclone_qbittorrent_host }}'
+          sftp-user: '{{ whisparr_rclone_qbittorrent_user }}'
+          sftp-pass: '{{ whisparr_rclone_qbittorrent_pass }}'
+          sftp-key-file-pass: '{{ whisparr_rclone_qbittorrent_key_file_pass }}'
+          allow_other: 'true'
+          vfs_cache_mode: 'off'
+
+- name: Register whisparr rclone qbittorrent volume
+  community.docker.docker_volume_info:
+    name: '{{ whisparr_rclone_qbittorrent_name }}'
+  register: whisparr_rclone_qbittorrent_volume_result

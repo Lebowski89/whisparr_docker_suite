@@ -1,0 +1,265 @@
+---
+
+################################
+# DEPENDENCIES
+################################
+
+- name: Install prerequisite apt packages
+  ansible.builtin.apt:
+    pkg:
+      - python3-requests
+      - python3-psycopg2
+      - python3-lxml
+    update_cache: true
+
+- name: Install collection requirements
+  community.general.ansible_galaxy_install:
+    type: collection
+    requirements_file: '{{ role_path }}/requirements.yml'
+
+################################
+# DOCKER
+################################
+
+- name: Apt install docker if required
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Gather apt facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Include docker install tasks
+      when: '"docker-ce" not in ansible_facts.packages'
+      ansible.builtin.include_tasks: 'sub_tasks/docker.yml'
+
+################################
+# CLEAN UP
+################################
+
+- name: Register whisparr container
+  community.docker.docker_container_info:
+    name: '{{ whisparr_basics_name }}'
+  register: whisparr_existing_container_result
+
+- name: Remove existing whisparr container
+  when: whisparr_existing_container_result.exists
+  community.docker.docker_container:
+    container_default_behavior: compatibility
+    name: '{{ whisparr_basics_name }}'
+    state: absent
+    stop_timeout: 10
+  register: remove_whisparr_docker
+  retries: 5
+  delay: 10
+  until: remove_whisparr_docker is succeeded
+
+################################
+# BACKEND NETWORK
+################################
+
+- name: Conduct backend network tasks
+  when: whisparr_network_backend_is_enabled
+  block:
+    - name: Register whisparr backend network
+      community.docker.docker_network_info:
+        name: '{{ whisparr_network_backend }}'
+      register: whisparr_net_backend_result
+
+    - name: Whisparr network backend builtin fail
+      ansible.builtin.fail:
+        msg: whisparr backend network does not exist nor is it enabled. Ensure the whisparr backend network variables contain valid entries.
+      when:
+        - not whisparr_net_backend_result.exists
+        - not whisparr_network_backend_is_enabled
+
+    - name: Create whisparr backend network
+      when:
+        - not whisparr_net_backend_result.exists
+        - whisparr_network_backend_is_enabled
+      community.docker.docker_network:
+        name: '{{ whisparr_network_backend }}'
+        driver: '{{ whisparr_network_backend_driver }}'
+        ipam_config:
+          - subnet: '{{ whisparr_network_backend_subnet }}'
+
+################################
+# APPDATA
+################################
+
+- name: Create whisparr appdata directory
+  ansible.builtin.file:
+    path: '{{ whisparr_paths_location }}'
+    state: directory
+    owner: '{{ whisparr_env_puid }}'
+    group: '{{ whisparr_env_pgid }}'
+    mode: '0755'
+
+################################
+# CONFIG
+################################
+
+- name: Check if whisparr config.xml exists
+  ansible.builtin.stat:
+    path: '{{ whisparr_paths_location }}/config.xml'
+  register: whisparr_config_xml
+
+- name: Create whisparr config.xml file
+  when: not whisparr_config_xml.stat.exists
+  block:
+    - name: Import config file
+      ansible.builtin.template:
+        src: '{{ role_path }}/templates/config.xml.j2'
+        dest: '{{ whisparr_paths_location }}/config.xml'
+        force: true
+        owner: '{{ whisparr_env_puid }}'
+        group: '{{ whisparr_env_pgid }}'
+        mode: '0664'
+
+    - name: Wait for 'config.xml' to be created
+      ansible.builtin.wait_for:
+        path: '{{ whisparr_paths_location }}/config.xml'
+        state: present
+
+    - name: Whisparr config.xml | Lookup Apikey value
+      when: whisparr_api_key_is_enabled
+      community.general.xml:
+        path: '{{ whisparr_paths_location }}/config.xml'
+        xpath: "/Config/ApiKey"
+        content: "text"
+      register: xml_whisparr_api
+
+    - name: Whisparr config.xml | insert existing api key
+      when:
+        - whisparr_api_key_is_enabled
+        - ((xml_whisparr_api.matches[0].ApiKey is defined) and (xml_whisparr_api.matches[0].ApiKey != whisparr_api_key))
+      community.general.xml:
+        path: '{{ whisparr_paths_location }}/config.xml'
+        xpath: '/Config/ApiKey'
+        value: '{{ whisparr_api_key }}'
+
+    - name: Whisparr config.xml | Lookup AuthenticationMethod value
+      when: whisparr_authelia_is_enabled
+      community.general.xml:
+        path: '{{ whisparr_paths_location }}/config.xml'
+        xpath: "/Config/AuthenticationMethod"
+        content: "text"
+      register: xml_whisparr_external
+
+    - name: Register authelia container
+      when: whisparr_authelia_is_enabled
+      community.docker.docker_container_info:
+        name: '{{ whisparr_authelia_name }}'
+      register: whisparr_authelia_container_result
+
+    - name: Whisparr config.xml | change auth method to external  ## prevents double login when using authelia
+      when:
+        - whisparr_authelia_is_enabled
+        - whisparr_authelia_container_result.exists
+        - ((xml_whisparr_external.matches[0].AuthenticationMethod is defined) and (xml_whisparr_external.matches[0].AuthenticationMethod != 'External'))
+      community.general.xml:
+        path: '{{ whisparr_paths_location }}/config.xml'
+        xpath: '/Config/AuthenticationMethod'
+        value: 'External'
+
+################################
+# POSTGRES
+################################
+
+- name: Include postgres container tasks
+  when: whisparr_postgres_is_enabled
+  ansible.builtin.include_tasks: 'postgres/postgres_container.yml'
+
+- name: Include postgres database tasks
+  when: whisparr_postgres_is_enabled
+  ansible.builtin.include_tasks: 'postgres/postgres_database.yml'
+
+- name: Include postgres whisparr config.xml tasks
+  when: whisparr_postgres_is_enabled
+  ansible.builtin.include_tasks: 'postgres/postgres_config_xml.yml'
+
+################################
+# TRAEFIK
+################################
+
+- name: Conduct traefik tasks
+  when: whisparr_traefik_is_enabled
+  block:
+    - name: Register traefik network
+      community.docker.docker_network_info:
+        name: '{{ whisparr_traefik_network }}'
+      register: whisparr_traefik_network_result
+
+    - name: Traefik builtin fail
+      when:
+        - not whisparr_traefik_network_is_enabled
+        - not whisparr_traefik_network_result.exists
+      ansible.builtin.fail:
+        msg: Traefik network does not exist nor is it enabled. Ensure the Traefik network variables contain valid entries.
+
+    - name: Create traefik network
+      when: not whisparr_traefik_network_result.exists
+      community.docker.docker_network:
+        name: '{{ whisparr_traefik_network }}'
+        driver: '{{ whisparr_traefik_network_driver }}'
+        ipam_config:
+          - subnet: '{{ whisparr_traefik_network_subnet }}'
+
+################################
+# CLOUDFLARE
+################################
+
+- name: Include cloudflare tasks
+  when: whisparr_cloudflare_is_enabled
+  ansible.builtin.include_tasks: 'sub_tasks/cloudflare.yml'
+
+################################
+# NFS
+################################
+
+- name: Include nfs tasks
+  ansible.builtin.include_tasks: 'sub_tasks/nfs.yml'
+
+################################
+# RCLONE
+################################
+
+- name: Include rclone tasks
+  when: whisparr_rclone_qbittorrent_is_enabled
+  ansible.builtin.include_tasks: 'sub_tasks/rclone.yml'
+
+################################
+# CONTAINER
+################################
+
+- name: Create whisparr container
+  when: not whisparr_traefik_is_enabled
+  community.docker.docker_container:
+    name: '{{ whisparr_basics_name }}'
+    image: '{{ whisparr_basics_image_repo }}:{{ whisparr_basics_image_tag }}'
+    networks: '{{ whisparr_docker_networks }}'
+    env:
+      PUID: '{{ whisparr_env_puid }}'
+      PGID: '{{ whisparr_env_pgid }}'
+      TZ: '{{ whisparr_env_timezone }}'
+    ports:
+      - '{{ whisparr_ports_host }}:{{ whisparr_ports_cont }}'
+    volumes: '{{ whisparr_docker_volumes }}'
+#    healthcheck:
+    restart_policy: '{{ whisparr_basics_restart_policy }}'
+
+- name: Create whisparr traefik container
+  when: whisparr_traefik_is_enabled
+  community.docker.docker_container:
+    name: '{{ whisparr_basics_name }}'
+    image: '{{ whisparr_basics_image_repo }}:{{ whisparr_basics_image_tag }}'
+    networks: '{{ whisparr_docker_networks }}'
+    env:
+      PUID: '{{ whisparr_env_puid }}'
+      PGID: '{{ whisparr_env_pgid }}'
+      TZ: '{{ whisparr_env_timezone }}'
+    labels: '{{ whisparr_traefik_labels }}'
+    ports:
+      - '{{ whisparr_ports_host }}:{{ whisparr_ports_cont }}'
+    volumes: '{{ whisparr_docker_volumes }}'
+    healthcheck:
+    restart_policy: '{{ whisparr_basics_restart_policy }}'

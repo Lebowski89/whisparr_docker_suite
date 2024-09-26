@@ -1,0 +1,82 @@
+---
+
+################################
+# API
+################################
+
+whisparr_api_key: []
+
+################################
+# BASICS
+################################
+
+whisparr_basics_name: 'whisparr'
+whisparr_basics_image_repo: 'ghcr.io/hotio/whisparr'
+whisparr_basics_image_tag: 'nightly'
+whisparr_basics_restart_policy: 'unless-stopped'
+
+################################
+# NETWORK
+################################
+
+whisparr_network_backend: 'proxy'  ## allows backend docker communication between whisparr and companion apps, such as recyclarr
+whisparr_network_backend_driver: []  ## only required if network doesn't exist
+whisparr_network_backend_subnet: []  ## only required if network doesn't exist
+
+################################
+# ENV
+################################
+
+whisparr_env_timezone: []
+whisparr_env_puid: []
+whisparr_env_pgid: []
+
+################################
+# PORTS
+################################
+
+whisparr_ports_host: '6969'
+whisparr_ports_cont: '6969'
+
+################################
+# PATHS
+################################
+
+whisparr_paths_folder: '{{ whisparr_basics_name }}'
+whisparr_paths_location: '/opt/{{ whisparr_paths_folder }}'
+
+################################
+# BINDS
+################################
+
+whisparr_volumes_binds_default:
+  - /etc/localtime:/etc/localtime:ro
+  - '{{ whisparr_paths_location }}:/config'
+
+################################
+# AUTHELIA
+################################
+
+whisparr_authelia_name: 'authelia'
+
+################################
+# TRAEFIK
+################################
+
+whisparr_traefik_subdomain: '{{ whisparr_basics_name }}'
+whisparr_traefik_domain: []
+whisparr_traefik_port: '6969'
+whisparr_traefik_themepark_theme: 'hotline'  ## See https://github.com/themepark-dev/theme.park
+
+  ## traefik docker network
+whisparr_traefik_network: 'traefik_proxy'
+whisparr_traefik_network_driver: []  ## only required if network doesn't exist
+whisparr_traefik_network_subnet: []  ## only required if network doesn't exist
+
+################################
+# CLOUDFLARE
+################################
+
+whisparr_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
+whisparr_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
+whisparr_cloudflare_api_token: []

@@ -1,0 +1,17 @@
+---
+
+- name: Stop autofs service
+  ansible.builtin.service:
+    name: autofs
+    state: stopped
+  listen: redo mounts
+
+- name: Unmount autofs mounts
+  ansible.builtin.command: umount -a -t autofs
+  listen: redo mounts
+
+- name: Start autofs service
+  ansible.builtin.service:
+    name: autofs
+    state: started
+  listen: redo mounts

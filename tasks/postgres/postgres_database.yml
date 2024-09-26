@@ -1,0 +1,43 @@
+---
+
+- name: Check for existing postgres databases
+  block:
+    - name: Ping for existing main database
+      community.postgresql.postgresql_ping:
+        login_host: '{{ whisparr_postgres_basics_host }}'
+        login_user: '{{ whisparr_postgres_auth_user }}'
+        login_password: '{{ whisparr_postgres_auth_password }}'
+        port: '{{ whisparr_postgres_ports_host }}'
+        db: '{{ whisparr_postgres_database_main }}'
+      register: whisparr_postgres_maindb
+
+    - name: Ping for existing log database
+      community.postgresql.postgresql_ping:
+        login_host: '{{ whisparr_postgres_basics_host }}'
+        login_user: '{{ whisparr_postgres_auth_user }}'
+        login_password: '{{ whisparr_postgres_auth_password }}'
+        port: '{{ whisparr_postgres_ports_host }}'
+        db: '{{ whisparr_postgres_database_log }}'
+      register: whisparr_postgres_logdb
+
+- name: Create postgres databases
+  block:
+    - name: Create postgres main database
+      when: not whisparr_postgres_maindb == true
+      community.postgresql.postgresql_db:
+        login_host: '{{ whisparr_postgres_basics_host }}'
+        login_user: '{{ whisparr_postgres_auth_user }}'
+        login_password: '{{ whisparr_postgres_auth_password }}'
+        port: '{{ whisparr_postgres_ports_host }}'
+        name: '{{ whisparr_postgres_database_main }}'
+        state: 'present'
+
+    - name: Create postgres log database
+      when: not whisparr_postgres_logdb == true
+      community.postgresql.postgresql_db:
+        login_host: '{{ whisparr_postgres_basics_host }}'
+        login_user: '{{ whisparr_postgres_auth_user }}'
+        login_password: '{{ whisparr_postgres_auth_password }}'
+        port: '{{ whisparr_postgres_ports_host }}'
+        name: '{{ whisparr_postgres_database_log }}'
+        state: 'present'

@@ -1,0 +1,62 @@
+---
+
+- name: Perform autofs media mount tasks
+  when: whisparr_autofs_media_mount_is_enabled
+  block:
+    - name: Install autofs
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: autofs
+
+    - name: Install autofs
+      when: ansible_os_family == 'RedHat'
+      ansible.builtin.dnf:
+        name: autofs
+
+    - name: Make sure autofs service is running
+      ansible.builtin.service:
+        name: autofs
+        state: started
+
+    - name: Append desired local mount path to autofs auto.master file
+      ansible.builtin.lineinfile:
+        dest: '{{ whisparr_autofs_auto_mast_file }}'
+        line: '{{ whisparr_autofs_nfs_local_path }} {{ whisparr_autofs_nfsdb_file }} --timeout=0 --browse'
+        state: 'present'
+        create: true
+        owner: '{{ whisparr_nfs_env_puid }}'
+        group: '{{ whisparr_nfs_env_pgid }}'
+        mode: '0644'
+      notify:
+        - redo mounts
+
+    - name: Add mount to auto.nfsdb file
+      ansible.builtin.lineinfile:
+        dest: '{{ whisparr_autofs_nfsdb_file }}'
+        line: '{{ whisparr_autofs_media_mount_local_dir_name }} {{ whisparr_autofs_media_mount_opt }} {{ whisparr_autofs_media_mount_host_address }}:{{ whisparr_autofs_media_mount_remote_path }}'
+        state: 'present'
+        create: true
+        owner: '{{ whisparr_nfs_env_puid }}'
+        group: '{{ whisparr_nfs_env_pgid }}'
+        mode: '0644'
+      notify:
+        - redo mounts
+
+- name: Create whisparr nfs media volume
+  when: whisparr_nfs_media_volume_is_enabled
+  block:
+    - name: Create whisparr media nfs volume
+      community.docker.docker_volume:
+        volume_name: '{{ whisparr_nfs_media_name }}'
+        state: present
+        recreate: options-changed
+        driver: local
+        driver_options:
+          type: nfs
+          o: 'addr={{ whisparr_nfs_media_address }},{{ whisparr_nfs_media_permissions }},nfsvers={{ whisparr_nfs_media_version }}'
+          device: '{{ whisparr_nfs_media_device }}'
+
+    - name: Register whisparr nfs media volume
+      community.docker.docker_volume_info:
+        name: '{{ whisparr_nfs_media_name }}'
+      register: whisparr_nfs_media_volume_result

@@ -1,0 +1,148 @@
+---
+
+################################
+# API
+################################
+
+whisparr_api_key_is_enabled: '{{ (whisparr_api_key is defined) and
+                                 (whisparr_api_key is not none) and
+                                 (whisparr_api_key | trim | length > 0) }}'
+
+################################
+# NETWORK
+################################
+
+whisparr_network_backend_is_enabled: '{{ (whisparr_network_backend is defined) and
+                                         (whisparr_network_backend is not none) and
+                                         (whisparr_network_backend | trim | length > 0) and
+                                         (whisparr_network_backend_driver is defined) and
+                                         (whisparr_network_backend_driver is not none) and
+                                         (whisparr_network_backend_driver | trim | length > 0) and
+                                         (whisparr_network_backend_subnet is defined) and
+                                         (whisparr_network_backend_subnet is not none) and
+                                         (whisparr_network_backend_subnet | trim | length > 0) }}'
+
+whisparr_network_default_bind:
+  - name: '{{ whisparr_network_backend }}'
+whisparr_network_postgres_bind:
+  - name: '{{ whisparr_postgres_network }}'
+whisparr_network_traefik_bind:
+  - name: '{{ whisparr_traefik_network }}'
+
+whisparr_docker_networks: '{{ whisparr_network_default_bind
+                              + (whisparr_network_postgres_bind
+                                 if whisparr_postgres_is_enabled
+                                 else [])
+                              + (whisparr_network_traefik_bind
+                                 if whisparr_traefik_is_enabled
+                                 else []) }}'
+
+################################
+# BINDS
+################################
+
+whisparr_docker_volumes: '{{ whisparr_volumes_binds_default
+                             + (whisparr_nfs_media_bind
+                                if whisparr_nfs_media_volume_result.exists
+                                else [])
+                             + (whisparr_rclone_qbittorrent_bind
+                                if whisparr_rclone_qbittorrent_volume_result.exists
+                                else []) }}'
+
+################################
+# AUTHELIA
+################################
+
+whisparr_authelia_is_enabled: '{{ (whisparr_authelia_name is defined) and
+                                  (whisparr_authelia_name is not none) and
+                                  (whisparr_authelia_name | trim | length > 0) }}'
+
+################################
+# TRAEFIK
+################################
+
+whisparr_traefik_is_enabled: '{{ (whisparr_traefik_network is defined) and
+                                 (whisparr_traefik_network is not none) and
+                                 (whisparr_traefik_network | trim | length > 0) and
+                                 (whisparr_traefik_subdomain is defined) and
+                                 (whisparr_traefik_subdomain is not none) and
+                                 (whisparr_traefik_subdomain | trim | length > 0) and
+                                 (whisparr_traefik_domain is defined) and
+                                 (whisparr_traefik_domain is not none) and
+                                 (whisparr_traefik_domain | trim | length > 0) and
+                                 (whisparr_traefik_port is defined) and
+                                 (whisparr_traefik_port is not none) and
+                                 (whisparr_traefik_port | trim | length > 0) and
+                                 (whisparr_traefik_themepark_theme is defined) and
+                                 (whisparr_traefik_themepark_theme is not none) and
+                                 (whisparr_traefik_themepark_theme | trim | length > 0) }}'
+
+whisparr_traefik_network_is_enabled: '{{ (whisparr_traefik_network is defined) and
+                                         (whisparr_traefik_network is not none) and
+                                         (whisparr_traefik_network | trim | length > 0) and
+                                         (whisparr_traefik_network_driver is defined) and
+                                         (whisparr_traefik_network_driver is not none) and
+                                         (whisparr_traefik_network_driver | trim | length > 0) and
+                                         (whisparr_traefik_network_subnet is defined) and
+                                         (whisparr_traefik_network_subnet is not none) and
+                                         (whisparr_traefik_network_subnet | trim | length > 0) }}'
+
+whisparr_traefik_labels_default:
+  - traefik.enable: 'true'
+  - traefik.docker.network: '{{ whisparr_traefik_network }}'
+
+whisparr_traefik_labels_router:
+  traefik.http.routers.whisparr-rtr.entrypoints: 'http'
+  traefik.http.routers.whisparr-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
+  traefik.http.routers.whisparr-rtr.middlewares: 'globalHeaders@file,robotHeaders@file,authelia@docker'
+  traefik.http.routers.whisparr-rtr.priority: '20'
+  traefik.http.routers.whisparr-rtr.service: 'whisparr-rtr-svc'
+  traefik.http.services.whisparr-rtr-svc.loadbalancer.server.port: '{{ whisparr_traefik_port }}'
+  traefik.http.routers.whisparr-api-rtr.entrypoints: 'http'
+  traefik.http.routers.whisparr-api-rtr.middlewares: 'globalHeaders@file,robotHeaders@file'
+  traefik.http.routers.whisparr-api-rtr.priority: '30'
+  traefik.http.routers.whisparr-api-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api/websocket/`))'
+  traefik.http.routers.whisparr-api-rtr.service: 'whisparr-rtr-svc'
+
+whisparr_traefik_labels_router_secure:
+  traefik.http.routers.whisparr-rtr-secure.entrypoints: 'https'
+  traefik.http.routers.whisparr-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
+  traefik.http.routers.whisparr-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,authelia@docker'
+  traefik.http.routers.whisparr-rtr-secure.priority: '20'
+  traefik.http.routers.whisparr-rtr-secure.service: 'whisparr-rtr-secure-svc'
+  traefik.http.routers.whisparr-rtr-secure.tls.certresolver: 'dns-cloudflare'
+  traefik.http.routers.whisparr-rtr-secure.tls.options: 'tls-opts@file'
+  traefik.http.services.whisparr-rtr-secure-svc.loadbalancer.server.port: '{{ whisparr_traefik_port }}'
+  traefik.http.routers.whisparr-api-rtr-secure.entrypoints: 'https'
+  traefik.http.routers.whisparr-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+  traefik.http.routers.whisparr-api-rtr-secure.priority: '30'
+  traefik.http.routers.whisparr-api-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api/websocket/`))'
+  traefik.http.routers.whisparr-api-rtr-secure.service: 'whisparr-rtr-secure-svc'
+  traefik.http.routers.whisparr-api-rtr-secure.tls.certresolver: 'dns-cloudflare'
+  traefik.http.routers.whisparr-api-rtr-secure.tls.options: 'tls-opts@file'
+
+whisparr_traefik_labels_themepark:
+  traefik.http.middlewares.themepark-portainer.plugin.themepark.app: '{{ whisparr_basics_name }}'
+  traefik.http.middlewares.themepark-portainer.plugin.themepark.theme: '{{ whisparr_traefik_themepark_theme }}'
+
+whisparr_traefik_labels: '{{ whisparr_traefik_labels_default
+                             | combine(whisparr_traefik_labels_router)
+                             | combine(whisparr_traefik_labels_router_secure)
+                             | combine(whisparr_traefik_labels_themepark) }}'
+
+################################
+# CLOUDFLARE
+################################
+
+whisparr_cloudflare_record: '{{ whisparr_traefik_subdomain }}'
+whisparr_cloudflare_zone: '{{ whisparr_traefik_domain }}'
+
+whisparr_cloudflare_is_enabled: '{{ (whisparr_cloudflare_record_type is defined) and
+                                    (whisparr_cloudflare_record_type is not none) and
+                                    (whisparr_cloudflare_record_type | trim | length > 0) and
+                                    (whisparr_cloudflare_proxy is defined) and
+                                    (whisparr_cloudflare_proxy is not none) and
+                                    (whisparr_cloudflare_proxy | trim | length > 0) and
+                                    (whisparr_cloudflare_api_token is defined) and
+                                    (whisparr_cloudflare_api_token is not none) and
+                                    (whisparr_cloudflare_api_token | trim | length > 0) }}'

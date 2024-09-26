@@ -1,0 +1,46 @@
+---
+
+################################
+# ENV
+################################
+
+whisparr_rclone_docker_plugin_env_puid: []
+whisparr_rclone_docker_plugin_env_pgid: []
+
+################################
+# MOUNTS
+################################
+
+  ## qbittorrent remote
+
+whisparr_rclone_qbittorrent_type: 'sftp'
+whisparr_rclone_qbittorrent_name: []
+whisparr_rclone_qbittorrent_mount_path: []
+whisparr_rclone_qbittorrent_host: []
+whisparr_rclone_qbittorrent_user: []
+whisparr_rclone_qbittorrent_pass: []
+whisparr_rclone_qbittorrent_key_file_pass: []
+
+  ## mount path can be anything, but if using unpackerr it should mimic the path to download folder on remote client
+  ## unpackerr is highly recommended for archived downloads on remote clients. whisparr may import incomplete files, otherwise.
+
+################################
+# BINDS
+################################
+
+whisparr_rclone_qbittorrent_bind:
+  - '{{ whisparr_rclone_qbittorrent_name }}:{{ whisparr_rclone_qbittorrent_mount_path }}'
+
+################################
+# PLUGIN GLOBAL ARGS
+################################
+
+whisparr_rclone_docker_plugin_global_args: "--rc --rc-web-gui --rc-web-gui-update --rc-web-gui-no-open-browser --rc-addr={{ whisparr_rclone_docker_plugin_webui_addr }} --rc-user={{ whisparr_rclone_docker_plugin_webui_user }} --rc-pass={{ whisparr_rclone_docker_plugin_webui_pass }} --rc-enable-metrics"
+
+################################
+# RCLONE WEBUI
+################################
+
+whisparr_rclone_docker_plugin_webui_addr: ':5572'
+whisparr_rclone_docker_plugin_webui_user: []
+whisparr_rclone_docker_plugin_webui_pass: []
