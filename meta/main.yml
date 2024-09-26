@@ -20,7 +20,8 @@ galaxy_info:
     - name: Debian-based
 
   galaxy_tags:
-    - whisparr
+    - Whisparr
+    - Docker
     - servarr
     - pvr
     - adult
