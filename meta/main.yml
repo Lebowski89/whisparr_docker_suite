@@ -11,8 +11,10 @@ galaxy_info:
 
   galaxy_tags:
     - whisparr
-    - Docker
+    - docker
     - servarr
+    - cloudflare
+    - traefik
     - pvr
     - adult
     - media
