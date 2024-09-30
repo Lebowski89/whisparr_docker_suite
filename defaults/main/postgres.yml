@@ -65,7 +65,7 @@ whisparr_postgres_auth_password_file: 'postgres_key.txt'
 ################################
 
 whisparr_postgres_database_main: 'whisparr-main'
-whisparr_postgres_database_log: 'whisparr-log' 
+whisparr_postgres_database_log: 'whisparr-log'
 
 ################################
 # CLEAN
@@ -74,5 +74,5 @@ whisparr_postgres_database_log: 'whisparr-log'
   ## warning: the below toggles will delete any existing sqlite database files in the whisparr appdir.
   ## toggle false if you're planning to migrate db data. See: https://wiki.servarr.com/whisparr/postgres-setup
 
-whisparr_postgres_clean_files: true  # true will delete any existing sqlite database files in the whisparr appdir.
-whisparr_postgres_clean_folders: true  # true will delete sqlite backups folder in the whisparr appdir.
+whisparr_postgres_clean_files: false  # true will delete any existing sqlite database files in the whisparr appdir.
+whisparr_postgres_clean_folders: false  # true will delete sqlite backups folder in the whisparr appdir.
