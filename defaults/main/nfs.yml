@@ -4,17 +4,17 @@
 # ENV
 ################################
 
-whisparr_nfs_env_timezone: []
-whisparr_nfs_env_puid: []
-whisparr_nfs_env_pgid: []
+whisparr_nfs_env_timezone: ''
+whisparr_nfs_env_puid: ''
+whisparr_nfs_env_pgid: ''
 
 ################################
 # AUTOFS
 ################################
 
-whisparr_autofs_media_mount_host_address: []
-whisparr_autofs_media_mount_remote_path: []
-whisparr_autofs_media_mount_local_dir_name: []
+whisparr_autofs_media_mount_host_address: ''
+whisparr_autofs_media_mount_remote_path: ''
+whisparr_autofs_media_mount_local_dir_name: ''
 whisparr_autofs_media_mount_opt: '-fstype=nfs,port=2049,rw,timeo=100,noatime'
 
   ## autofs to mount the nfs media remote on the host
@@ -25,9 +25,9 @@ whisparr_autofs_media_mount_opt: '-fstype=nfs,port=2049,rw,timeo=100,noatime'
 
   ## media remote
 
-whisparr_nfs_media_name: []
-whisparr_nfs_media_address: []
-whisparr_nfs_media_device: []
+whisparr_nfs_media_name: ''
+whisparr_nfs_media_address: ''
+whisparr_nfs_media_device: ''
 whisparr_nfs_media_permissions: 'rw'
 whisparr_nfs_media_version: '4'
 

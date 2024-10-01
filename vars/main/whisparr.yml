@@ -101,7 +101,7 @@ whisparr_traefik_labels_router:
   traefik.http.routers.whisparr-api-rtr.entrypoints: 'http'
   traefik.http.routers.whisparr-api-rtr.middlewares: 'globalHeaders@file,robotHeaders@file'
   traefik.http.routers.whisparr-api-rtr.priority: '30'
-  traefik.http.routers.whisparr-api-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api/websocket/`))'
+  traefik.http.routers.whisparr-api-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
   traefik.http.routers.whisparr-api-rtr.service: 'whisparr-rtr-svc'
 
 whisparr_traefik_labels_router_secure:
@@ -116,7 +116,7 @@ whisparr_traefik_labels_router_secure:
   traefik.http.routers.whisparr-api-rtr-secure.entrypoints: 'https'
   traefik.http.routers.whisparr-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
   traefik.http.routers.whisparr-api-rtr-secure.priority: '30'
-  traefik.http.routers.whisparr-api-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api/websocket/`))'
+  traefik.http.routers.whisparr-api-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
   traefik.http.routers.whisparr-api-rtr-secure.service: 'whisparr-rtr-secure-svc'
   traefik.http.routers.whisparr-api-rtr-secure.tls.certresolver: 'dns-cloudflare'
   traefik.http.routers.whisparr-api-rtr-secure.tls.options: 'tls-opts@file'

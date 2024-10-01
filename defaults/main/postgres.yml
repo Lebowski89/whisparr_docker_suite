@@ -4,7 +4,7 @@
 # BASICS
 ################################
 
-whisparr_postgres_basics_host: []  # machine address for ansible postgres module to ping database
+whisparr_postgres_basics_host: ''  # machine address for ansible postgres module to ping database
 whisparr_postgres_basics_name: 'postgres'
 whisparr_postgres_basics_image_repo: 'postgres'
 whisparr_postgres_basics_image_tag: '14'
@@ -15,16 +15,16 @@ whisparr_postgres_basics_restart_policy: 'unless-stopped'
 ################################
 
 whisparr_postgres_network: 'postgres'
-whisparr_postgres_network_driver: []  ## only required if network doesn't exist
-whisparr_postgres_network_subnet: []  ## only required if network doesn't exist
+whisparr_postgres_network_driver: ''  ## only required if network doesn't exist
+whisparr_postgres_network_subnet: ''  ## only required if network doesn't exist
 
 ################################
 # ENV
 ################################
 
-whisparr_postgres_env_timezone: []
-whisparr_postgres_env_puid: []
-whisparr_postgres_env_pgid: []
+whisparr_postgres_env_timezone: ''
+whisparr_postgres_env_puid: ''
+whisparr_postgres_env_pgid: ''
 
 ################################
 # PORTS
@@ -56,8 +56,8 @@ whisparr_postgres_binds_keys_mapping:
 # AUTH
 ################################
 
-whisparr_postgres_auth_user: []
-whisparr_postgres_auth_password: []
+whisparr_postgres_auth_user: ''
+whisparr_postgres_auth_password: ''
 whisparr_postgres_auth_password_file: 'postgres_key.txt'
 
 ################################
