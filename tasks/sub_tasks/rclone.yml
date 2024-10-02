@@ -71,8 +71,3 @@
           sftp-key-file-pass: '{{ whisparr_rclone_qbittorrent_key_file_pass }}'
           allow_other: 'true'
           vfs_cache_mode: 'off'
-
-- name: Register whisparr rclone qbittorrent volume
-  community.docker.docker_volume_info:
-    name: '{{ whisparr_rclone_qbittorrent_name }}'
-  register: whisparr_rclone_qbittorrent_volume_result

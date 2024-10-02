@@ -1,9 +1,6 @@
 ---
 
-whisparr_rclone_qbittorrent_is_enabled: '{{ (whisparr_rclone_qbittorrent_type is defined) and
-                                            (whisparr_rclone_qbittorrent_type is not none) and
-                                            (whisparr_rclone_qbittorrent_type | trim | length > 0) and
-                                            (whisparr_rclone_qbittorrent_name is defined) and
+whisparr_rclone_qbittorrent_is_enabled: '{{ (whisparr_rclone_qbittorrent_name is defined) and
                                             (whisparr_rclone_qbittorrent_name is not none) and
                                             (whisparr_rclone_qbittorrent_name | trim | length > 0) and
                                             (whisparr_rclone_qbittorrent_mount_path is defined) and

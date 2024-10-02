@@ -7,18 +7,6 @@
 whisparr_postgres_is_enabled: '{{ (whisparr_postgres_basics_host is defined) and
                                   (whisparr_postgres_basics_host is not none) and
                                   (whisparr_postgres_basics_host | trim | length > 0) and
-                                  (whisparr_postgres_basics_name is defined) and
-                                  (whisparr_postgres_basics_name is not none) and
-                                  (whisparr_postgres_basics_name | trim | length > 0) and
-                                  (whisparr_postgres_basics_image_repo is defined) and
-                                  (whisparr_postgres_basics_image_repo is not none) and
-                                  (whisparr_postgres_basics_image_repo | trim | length > 0) and
-                                  (whisparr_postgres_basics_image_tag is defined) and
-                                  (whisparr_postgres_basics_image_tag is not none) and
-                                  (whisparr_postgres_basics_image_tag | trim | length > 0) and
-                                  (whisparr_postgres_basics_restart_policy is defined) and
-                                  (whisparr_postgres_basics_restart_policy is not none) and
-                                  (whisparr_postgres_basics_restart_policy | trim | length > 0) and
                                   (whisparr_postgres_env_timezone is defined) and
                                   (whisparr_postgres_env_timezone is not none) and
                                   (whisparr_postgres_env_timezone | trim | length > 0) and
@@ -28,54 +16,18 @@ whisparr_postgres_is_enabled: '{{ (whisparr_postgres_basics_host is defined) and
                                   (whisparr_postgres_env_pgid is defined) and
                                   (whisparr_postgres_env_pgid is not none) and
                                   (whisparr_postgres_env_pgid | trim | length > 0) and
-                                  (whisparr_postgres_ports_host is defined) and
-                                  (whisparr_postgres_ports_host is not none) and
-                                  (whisparr_postgres_ports_host | trim | length > 0) and
-                                  (whisparr_postgres_ports_cont is defined) and
-                                  (whisparr_postgres_ports_cont is not none) and
-                                  (whisparr_postgres_ports_cont | trim | length > 0) and
-                                  (whisparr_postgres_paths_folder is defined) and
-                                  (whisparr_postgres_paths_folder is not none) and
-                                  (whisparr_postgres_paths_folder | trim | length > 0) and
-                                  (whisparr_postgres_paths_location is defined) and
-                                  (whisparr_postgres_paths_location is not none) and
-                                  (whisparr_postgres_paths_location | trim | length > 0) and
-                                  (whisparr_postgres_paths_keys_folder is defined) and
-                                  (whisparr_postgres_paths_keys_folder is not none) and
-                                  (whisparr_postgres_paths_keys_folder | trim | length > 0) and
-                                  (whisparr_postgres_paths_keys_location is defined) and
-                                  (whisparr_postgres_paths_keys_location is not none) and
-                                  (whisparr_postgres_paths_keys_location | trim | length > 0) and
-                                  (whisparr_postgres_binds_config_mapping is defined) and
-                                  (whisparr_postgres_binds_config_mapping is not none) and
-                                  (whisparr_postgres_binds_config_mapping | trim | length > 0) and
-                                  (whisparr_postgres_binds_keys_mapping is defined) and
-                                  (whisparr_postgres_binds_keys_mapping is not none) and
-                                  (whisparr_postgres_binds_keys_mapping | trim | length > 0) and
-                                  (whisparr_postgres_network is defined) and
-                                  (whisparr_postgres_network is not none) and
-                                  (whisparr_postgres_network | trim | length > 0) and
                                   (whisparr_postgres_auth_user is defined) and
                                   (whisparr_postgres_auth_user is not none) and
                                   (whisparr_postgres_auth_user | trim | length > 0) and
                                   (whisparr_postgres_auth_password is defined) and
                                   (whisparr_postgres_auth_password is not none) and
-                                  (whisparr_postgres_auth_password | trim | length > 0) and
-                                  (whisparr_postgres_database_main is defined) and
-                                  (whisparr_postgres_database_main is not none) and
-                                  (whisparr_postgres_database_main | trim | length > 0) and
-                                  (whisparr_postgres_database_log is defined) and
-                                  (whisparr_postgres_database_log is not none) and
-                                  (whisparr_postgres_database_log | trim | length > 0) }}'
+                                  (whisparr_postgres_auth_password | trim | length > 0) }}'
 
 ################################
 # NETWORK
 ################################
 
-whisparr_postgres_network_is_enabled: '{{ (whisparr_postgres_network is defined) and
-                                          (whisparr_postgres_network is not none) and
-                                          (whisparr_postgres_network | trim | length > 0) and
-                                          (whisparr_postgres_network_driver is defined) and
+whisparr_postgres_network_is_enabled: '{{ (whisparr_postgres_network_driver is defined) and
                                           (whisparr_postgres_network_driver is not none) and
                                           (whisparr_postgres_network_driver | trim | length > 0) and
                                           (whisparr_postgres_network_subnet is defined) and
@@ -88,31 +40,3 @@ whisparr_postgres_network_is_enabled: '{{ (whisparr_postgres_network is defined)
 
 whisparr_postgres_binds: '{{ whisparr_postgres_binds_config_mapping
                              + whisparr_postgres_binds_keys_mapping }}'
-
-################################
-# CONFIG
-################################
-
-whisparr_postgres_config_xml_user_is_enabled: '{{ (whisparr_postgres_auth_user is defined) and
-                                                  (whisparr_postgres_auth_user is not none) and
-                                                  (whisparr_postgres_auth_user | trim | length > 0) }}'
-
-whisparr_postgres_config_xml_password_is_enabled: '{{ (whisparr_postgres_auth_password is defined) and
-                                                      (whisparr_postgres_auth_password is not none) and
-                                                      (whisparr_postgres_auth_password | trim | length > 0) }}'
-
-whisparr_postgres_config_xml_port_is_enabled: '{{ (whisparr_postgres_ports_host is defined) and
-                                                  (whisparr_postgres_ports_cont is not none) and
-                                                  (whisparr_postgres_ports_cont | trim | length > 0) }}'
-
-whisparr_postgres_config_xml_host_is_enabled: '{{ (whisparr_postgres_basics_name is defined) and
-                                                  (whisparr_postgres_basics_name is not none) and
-                                                  (whisparr_postgres_basics_name | trim | length > 0) }}'
-
-whisparr_postgres_config_xml_db_main_is_enabled: '{{ (whisparr_postgres_database_main is defined) and
-                                                     (whisparr_postgres_database_main is not none) and
-                                                     (whisparr_postgres_database_main | trim | length > 0) }}'
-
-whisparr_postgres_config_xml_db_log_is_enabled: '{{ (whisparr_postgres_database_log is defined) and
-                                                    (whisparr_postgres_database_log is not none) and
-                                                    (whisparr_postgres_database_log | trim | length > 0) }}'

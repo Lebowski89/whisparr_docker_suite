@@ -55,8 +55,3 @@
           type: nfs
           o: 'addr={{ whisparr_nfs_media_address }},{{ whisparr_nfs_media_permissions }},nfsvers={{ whisparr_nfs_media_version }}'
           device: '{{ whisparr_nfs_media_device }}'
-
-    - name: Register whisparr nfs media volume
-      community.docker.docker_volume_info:
-        name: '{{ whisparr_nfs_media_name }}'
-      register: whisparr_nfs_media_volume_result

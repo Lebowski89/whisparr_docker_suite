@@ -4,7 +4,6 @@
 # ENV
 ################################
 
-whisparr_nfs_env_timezone: ''
 whisparr_nfs_env_puid: ''
 whisparr_nfs_env_pgid: ''
 

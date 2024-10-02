@@ -12,16 +12,6 @@ whisparr_api_key_is_enabled: '{{ (whisparr_api_key is defined) and
 # NETWORK
 ################################
 
-whisparr_network_backend_is_enabled: '{{ (whisparr_network_backend is defined) and
-                                         (whisparr_network_backend is not none) and
-                                         (whisparr_network_backend | trim | length > 0) and
-                                         (whisparr_network_backend_driver is defined) and
-                                         (whisparr_network_backend_driver is not none) and
-                                         (whisparr_network_backend_driver | trim | length > 0) and
-                                         (whisparr_network_backend_subnet is defined) and
-                                         (whisparr_network_backend_subnet is not none) and
-                                         (whisparr_network_backend_subnet | trim | length > 0) }}'
-
 whisparr_network_default_bind:
   - name: '{{ whisparr_network_backend }}'
 whisparr_network_postgres_bind:
@@ -37,16 +27,23 @@ whisparr_docker_networks: '{{ whisparr_network_default_bind
                                  if whisparr_traefik_is_enabled
                                  else []) }}'
 
+whisparr_network_backend_is_enabled: '{{ (whisparr_network_backend_driver is defined) and
+                                         (whisparr_network_backend_driver is not none) and
+                                         (whisparr_network_backend_driver | trim | length > 0) and
+                                         (whisparr_network_backend_subnet is defined) and
+                                         (whisparr_network_backend_subnet is not none) and
+                                         (whisparr_network_backend_subnet | trim | length > 0) }}'
+
 ################################
 # BINDS
 ################################
 
 whisparr_docker_volumes: '{{ whisparr_volumes_binds_default
                              + (whisparr_nfs_media_bind
-                                if whisparr_nfs_media_volume_result.exists
+                                if whisparr_nfs_media_volume_is_enabled
                                 else [])
                              + (whisparr_rclone_qbittorrent_bind
-                                if whisparr_rclone_qbittorrent_volume_result.exists
+                                if whisparr_rclone_qbittorrent_is_enabled
                                 else []) }}'
 
 ################################
@@ -60,32 +57,6 @@ whisparr_authelia_is_enabled: '{{ (whisparr_authelia_name is defined) and
 ################################
 # TRAEFIK
 ################################
-
-whisparr_traefik_is_enabled: '{{ (whisparr_traefik_network is defined) and
-                                 (whisparr_traefik_network is not none) and
-                                 (whisparr_traefik_network | trim | length > 0) and
-                                 (whisparr_traefik_subdomain is defined) and
-                                 (whisparr_traefik_subdomain is not none) and
-                                 (whisparr_traefik_subdomain | trim | length > 0) and
-                                 (whisparr_traefik_domain is defined) and
-                                 (whisparr_traefik_domain is not none) and
-                                 (whisparr_traefik_domain | trim | length > 0) and
-                                 (whisparr_traefik_port is defined) and
-                                 (whisparr_traefik_port is not none) and
-                                 (whisparr_traefik_port | trim | length > 0) and
-                                 (whisparr_traefik_themepark_theme is defined) and
-                                 (whisparr_traefik_themepark_theme is not none) and
-                                 (whisparr_traefik_themepark_theme | trim | length > 0) }}'
-
-whisparr_traefik_network_is_enabled: '{{ (whisparr_traefik_network is defined) and
-                                         (whisparr_traefik_network is not none) and
-                                         (whisparr_traefik_network | trim | length > 0) and
-                                         (whisparr_traefik_network_driver is defined) and
-                                         (whisparr_traefik_network_driver is not none) and
-                                         (whisparr_traefik_network_driver | trim | length > 0) and
-                                         (whisparr_traefik_network_subnet is defined) and
-                                         (whisparr_traefik_network_subnet is not none) and
-                                         (whisparr_traefik_network_subnet | trim | length > 0) }}'
 
 whisparr_traefik_labels_default:
   - traefik.enable: 'true'
@@ -130,6 +101,17 @@ whisparr_traefik_labels: '{{ whisparr_traefik_labels_default
                              | combine(whisparr_traefik_labels_router_secure)
                              | combine(whisparr_traefik_labels_themepark) }}'
 
+whisparr_traefik_is_enabled: '{{ (whisparr_traefik_domain is defined) and
+                                 (whisparr_traefik_domain is not none) and
+                                 (whisparr_traefik_domain | trim | length > 0) }}'
+
+whisparr_traefik_network_is_enabled: '{{ (whisparr_traefik_network_driver is defined) and
+                                         (whisparr_traefik_network_driver is not none) and
+                                         (whisparr_traefik_network_driver | trim | length > 0) and
+                                         (whisparr_traefik_network_subnet is defined) and
+                                         (whisparr_traefik_network_subnet is not none) and
+                                         (whisparr_traefik_network_subnet | trim | length > 0) }}'
+
 ################################
 # CLOUDFLARE
 ################################
@@ -137,12 +119,6 @@ whisparr_traefik_labels: '{{ whisparr_traefik_labels_default
 whisparr_cloudflare_record: '{{ whisparr_traefik_subdomain }}'
 whisparr_cloudflare_zone: '{{ whisparr_traefik_domain }}'
 
-whisparr_cloudflare_is_enabled: '{{ (whisparr_cloudflare_record_type is defined) and
-                                    (whisparr_cloudflare_record_type is not none) and
-                                    (whisparr_cloudflare_record_type | trim | length > 0) and
-                                    (whisparr_cloudflare_proxy is defined) and
-                                    (whisparr_cloudflare_proxy is not none) and
-                                    (whisparr_cloudflare_proxy | trim | length > 0) and
-                                    (whisparr_cloudflare_api_token is defined) and
+whisparr_cloudflare_is_enabled: '{{ (whisparr_cloudflare_api_token is defined) and
                                     (whisparr_cloudflare_api_token is not none) and
                                     (whisparr_cloudflare_api_token | trim | length > 0) }}'

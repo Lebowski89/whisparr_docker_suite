@@ -8,7 +8,13 @@ whisparr_autofs_auto_mast_file: '/etc/auto.master'  ## autofs config file
 whisparr_autofs_nfsdb_file: '/etc/auto.nfsdb'  ## autofs nfs mount file
 whisparr_autofs_nfs_local_path: '/mnt/nfs'  ## local path to mount remotes
 
-whisparr_autofs_media_mount_is_enabled: '{{ (whisparr_autofs_media_mount_host_address is defined) and
+whisparr_autofs_media_mount_is_enabled: '{{ (whisparr_nfs_env_puid is defined) and
+                                            (whisparr_nfs_env_puid is not none) and
+                                            (whisparr_nfs_env_puid | trim | length > 0) and
+                                            (whisparr_nfs_env_pgid is defined) and
+                                            (whisparr_nfs_env_pgid is not none) and
+                                            (whisparr_nfs_env_pgid | trim | length > 0) and
+                                            (whisparr_autofs_media_mount_host_address is defined) and
                                             (whisparr_autofs_media_mount_host_address is not none) and
                                             (whisparr_autofs_media_mount_host_address | trim | length > 0) and
                                             (whisparr_autofs_media_mount_remote_path is defined) and
@@ -16,10 +22,7 @@ whisparr_autofs_media_mount_is_enabled: '{{ (whisparr_autofs_media_mount_host_ad
                                             (whisparr_autofs_media_mount_remote_path | trim | length > 0) and
                                             (whisparr_autofs_media_mount_local_dir_name is defined) and
                                             (whisparr_autofs_media_mount_local_dir_name is not none) and
-                                            (whisparr_autofs_media_mount_local_dir_name | trim | length > 0) and
-                                            (whisparr_autofs_media_mount_opt is defined) and
-                                            (whisparr_autofs_media_mount_opt is not none) and
-                                            (whisparr_autofs_media_mount_opt | trim | length > 0) }}'
+                                            (whisparr_autofs_media_mount_local_dir_name | trim | length > 0) }}'
 
 ################################
 # NFS
@@ -33,10 +36,4 @@ whisparr_nfs_media_volume_is_enabled: '{{ (whisparr_nfs_media_name is defined) a
                                           (whisparr_nfs_media_address | trim | length > 0) and
                                           (whisparr_nfs_media_device is defined) and
                                           (whisparr_nfs_media_device is not none) and
-                                          (whisparr_nfs_media_device | trim | length > 0) and
-                                          (whisparr_nfs_media_permissions is defined) and
-                                          (whisparr_nfs_media_permissions is not none) and
-                                          (whisparr_nfs_media_permissions | trim | length > 0) and
-                                          (whisparr_nfs_media_version is defined) and
-                                          (whisparr_nfs_media_version is not none) and
-                                          (whisparr_nfs_media_version | trim | length > 0) }}'
+                                          (whisparr_nfs_media_device | trim | length > 0) }}'
