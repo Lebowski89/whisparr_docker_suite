@@ -1,7 +1,7 @@
 Whisparr Suite
 =========
 
-    Ansible role to automate the full set-up of Whisparr - an adult media collection manager for Usenet and BitTorrent users.
+    Standalone Ansible role to automate the full set-up of Whisparr - an adult media collection manager for Usenet and BitTorrent users.
       - Includes the installation of Docker (Debian-based distros) and Ansible dependencies within the role.
       - Includes the option of setting up and connecting Whisparr to a Postgres database.
       - Includes the option of creating a Cloudflare DNS record for your Whisparr instance for reverse proxy purposes.
