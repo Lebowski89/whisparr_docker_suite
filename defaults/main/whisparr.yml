@@ -53,6 +53,9 @@ whisparr_volumes_binds_default:
   - /etc/localtime:/etc/localtime:ro
   - '{{ whisparr_paths_location }}:/config'
 
+whisparr_volumes_binds_themepark:  ## only binds if local themepark is deployed
+  - '{{ whisparr_themepark_paths_location }}/docker-mods/98-themepark-whisparr:/etc/cont-init.d/98-themepark'
+
 ################################
 # AUTHELIA
 ################################
@@ -66,7 +69,6 @@ whisparr_authelia_name: 'authelia'
 whisparr_traefik_subdomain: '{{ whisparr_basics_name }}'
 whisparr_traefik_domain: ''
 whisparr_traefik_port: '6969'
-whisparr_traefik_themepark_theme: 'hotline'  ## See https://github.com/themepark-dev/theme.park
 
   ## traefik docker network
 whisparr_traefik_network: 'traefik_proxy'
@@ -80,3 +82,9 @@ whisparr_traefik_network_subnet: ''  ## only required if network doesn't exist
 whisparr_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
 whisparr_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
 whisparr_cloudflare_api_token: ''
+
+################################
+# THEME
+################################
+
+whisparr_theme: 'hotline'  ## See https://github.com/themepark-dev/theme.park

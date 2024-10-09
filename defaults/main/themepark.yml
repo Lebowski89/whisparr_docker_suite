@@ -1,0 +1,51 @@
+---
+
+################################
+# BASICS
+################################
+
+whisparr_themepark_basics_name: 'theme-park'
+whisparr_themepark_basics_image_repo: 'ghcr.io/themepark-dev/theme.park'
+whisparr_themepark_basics_image_tag: 'latest'
+whisparr_themepark_basics_restart_policy: 'unless-stopped'
+
+################################
+# ENV
+################################
+
+whisparr_themepark_env_timezone: ''
+whisparr_themepark_env_puid: ''
+whisparr_themepark_env_pgid: ''
+
+################################
+# DOMAIN (LOCAL)
+################################
+
+  ## Fill if wanting themes served locally via http on local network.
+  ## Will deploy theme-park in a docker container.
+  ## Must be accessible to your browser - try: '<local_machine_ip>:{{ whisparr_themepark_ports_host }}'
+
+whisparr_themepark_domain_local: ''
+
+################################
+# PORTS
+################################
+
+whisparr_themepark_ports_host: '8089'
+whisparr_themepark_ports_cont: '80'
+
+################################
+# PATHS
+################################
+
+whisparr_themepark_paths_folder: '{{ whisparr_themepark_basics_name }}'
+whisparr_themepark_paths_location: '/opt/{{ whisparr_themepark_paths_folder }}'
+
+################################
+# BINDS
+################################
+
+whisparr_themepark_bind_mount:
+  - '{{ whisparr_themepark_paths_location }}:/config'
+
+

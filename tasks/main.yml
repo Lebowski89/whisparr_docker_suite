@@ -228,6 +228,22 @@
   ansible.builtin.include_tasks: 'sub_tasks/rclone.yml'
 
 ################################
+# THEMEPARK
+################################
+
+- name: Run themepark tasks
+  when: whisparr_themepark_local_is_enabled
+  block:
+    - name: Register themepark container
+      community.docker.docker_container_info:
+        name: '{{ whisparr_themepark_basics_name }}'
+      register: whisparr_themepark_container_result
+
+    - name: Include themepark tasks
+      when: not whisparr_themepark_container_result.exists
+      ansible.builtin.include_tasks: 'sub_tasks/themepark.yml'
+
+################################
 # CONTAINER
 ################################
 
@@ -237,14 +253,10 @@
     name: '{{ whisparr_basics_name }}'
     image: '{{ whisparr_basics_image_repo }}:{{ whisparr_basics_image_tag }}'
     networks: '{{ whisparr_docker_networks }}'
-    env:
-      PUID: '{{ whisparr_env_puid }}'
-      PGID: '{{ whisparr_env_pgid }}'
-      TZ: '{{ whisparr_env_timezone }}'
+    env: '{{ whisparr_docker_envs }}'
     ports:
       - '{{ whisparr_ports_host }}:{{ whisparr_ports_cont }}'
     volumes: '{{ whisparr_docker_volumes }}'
-#    healthcheck:
     restart_policy: '{{ whisparr_basics_restart_policy }}'
 
 - name: Create whisparr traefik container
@@ -253,13 +265,9 @@
     name: '{{ whisparr_basics_name }}'
     image: '{{ whisparr_basics_image_repo }}:{{ whisparr_basics_image_tag }}'
     networks: '{{ whisparr_docker_networks }}'
-    env:
-      PUID: '{{ whisparr_env_puid }}'
-      PGID: '{{ whisparr_env_pgid }}'
-      TZ: '{{ whisparr_env_timezone }}'
+    env: '{{ whisparr_docker_envs }}'
     labels: '{{ whisparr_traefik_labels }}'
     ports:
       - '{{ whisparr_ports_host }}:{{ whisparr_ports_cont }}'
     volumes: '{{ whisparr_docker_volumes }}'
-    healthcheck:
     restart_policy: '{{ whisparr_basics_restart_policy }}'

@@ -1,0 +1,31 @@
+---
+
+################################
+# APPDATA
+################################
+
+- name: Create themepark appdata directory
+  ansible.builtin.file:
+    path: '{{ whisparr_themepark_paths_location }}'
+    state: directory
+    owner: '{{ whisparr_themepark_env_puid }}'
+    group: '{{ whisparr_themepark_env_pgid }}'
+    mode: '0755'
+
+################################
+# CONTAINER
+################################
+
+- name: Create themepark container
+  community.docker.docker_container:
+    name: '{{ whisparr_themepark_basics_name }}'
+    image: '{{ whisparr_themepark_basics_image_repo }}:{{ whisparr_themepark_basics_image_tag }}'
+    networks: '{{ whisparr_network_backend }}'
+    env:
+      PUID: '{{ whisparr_themepark_env_puid }}'
+      PGID: '{{ whisparr_themepark_env_pgid }}'
+      TZ: '{{ whisparr_themepark_env_timezone }}'
+    ports:
+      - '{{ whisparr_themepark_ports_host }}:{{ whisparr_themepark_ports_cont }}'    
+    volumes: '{{ whisparr_themepark_bind_mount }}'
+    restart_policy: '{{ whisparr_themepark_basics_restart_policy }}'
