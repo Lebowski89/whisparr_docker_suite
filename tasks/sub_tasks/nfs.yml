@@ -22,7 +22,7 @@
       ansible.builtin.lineinfile:
         dest: '{{ whisparr_autofs_auto_mast_file }}'
         line: '{{ whisparr_autofs_nfs_local_path }} {{ whisparr_autofs_nfsdb_file }} --timeout=0 --browse'
-        state: 'present'
+        state: present
         create: true
         owner: '{{ whisparr_nfs_env_puid }}'
         group: '{{ whisparr_nfs_env_pgid }}'
@@ -34,7 +34,7 @@
       ansible.builtin.lineinfile:
         dest: '{{ whisparr_autofs_nfsdb_file }}'
         line: '{{ whisparr_autofs_media_mount_local_dir_name }} {{ whisparr_autofs_media_mount_opt }} {{ whisparr_autofs_media_mount_host_address }}:{{ whisparr_autofs_media_mount_remote_path }}'
-        state: 'present'
+        state: present
         create: true
         owner: '{{ whisparr_nfs_env_puid }}'
         group: '{{ whisparr_nfs_env_pgid }}'

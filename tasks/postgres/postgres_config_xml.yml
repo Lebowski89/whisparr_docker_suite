@@ -5,42 +5,42 @@
     - name: Whisparr config.xml | Lookup PostgresUser value
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/PostgresUser'
+        xpath: /Config/PostgresUser
         print_match: true
       register: xml_whisparr_postgresuser
 
     - name: Whisparr config.xml | Lookup PostgresPassword value
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/PostgresPassword'
+        xpath: /Config/PostgresPassword
         print_match: true
       register: xml_whisparr_postgrespassword
 
     - name: Whisparr config.xml | Lookup PostgresPort value
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/PostgresPort'
+        xpath: /Config/PostgresPort
         print_match: true
       register: xml_whisparr_postgresport
 
     - name: Whisparr config.xml | Lookup PostgresHost value
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/PostgresHost'
+        xpath: /Config/PostgresHost
         print_match: true
       register: xml_whisparr_postgreshost
 
     - name: Whisparr config.xml | Lookup PostgresMainDb value
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/PostgresMainDb'
+        xpath: /Config/PostgresMainDb
         print_match: true
       register: xml_whisparr_postgresmaindb
 
     - name: Whisparr config.xml | Lookup PostgresLogDb value
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/PostgresLogDb'
+        xpath: /Config/PostgresLogDb
         print_match: true
       register: xml_whisparr_postgreslogdb
 
@@ -52,7 +52,7 @@
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
         pretty_print: true
-        xpath: '/Config/PostgresUser'
+        xpath: /Config/PostgresUser
         value: '{{ whisparr_postgres_auth_user }}'
 
     - name: Whisparr.xml | Adding PostgresPassword
@@ -61,7 +61,7 @@
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
         pretty_print: true
-        xpath: '/Config/PostgresPassword'
+        xpath: /Config/PostgresPassword
         value: '{{ whisparr_postgres_auth_password }}'
 
     - name: Whisparr.xml | Adding PostgresPort
@@ -70,7 +70,7 @@
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
         pretty_print: true
-        xpath: '/Config/PostgresPort'
+        xpath: /Config/PostgresPort
         value: '{{ whisparr_postgres_ports_cont }}'
 
     - name: Whisparr.xml | Adding PostgresHost
@@ -79,7 +79,7 @@
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
         pretty_print: true
-        xpath: '/Config/PostgresHost'
+        xpath: /Config/PostgresHost
         value: '{{ whisparr_postgres_basics_name }}'
 
     - name: Whisparr.xml | Adding PostgresMainDb
@@ -88,7 +88,7 @@
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
         pretty_print: true
-        xpath: '/Config/PostgresMainDb'
+        xpath: /Config/PostgresMainDb
         value: '{{ whisparr_postgres_database_main }}'
 
     - name: Whisparr.xml | Adding PostgresLogDb
@@ -97,7 +97,7 @@
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
         pretty_print: true
-        xpath: '/Config/PostgresLogDb'
+        xpath: /Config/PostgresLogDb
         value: '{{ whisparr_postgres_database_log }}'
 
 - name: Clean whisparr appdir

@@ -30,7 +30,7 @@
         login_password: '{{ whisparr_postgres_auth_password }}'
         port: '{{ whisparr_postgres_ports_host }}'
         name: '{{ whisparr_postgres_database_main }}'
-        state: 'present'
+        state: present
 
     - name: Create postgres log database
       when: not whisparr_postgres_logdb == true
@@ -40,4 +40,4 @@
         login_password: '{{ whisparr_postgres_auth_password }}'
         port: '{{ whisparr_postgres_ports_host }}'
         name: '{{ whisparr_postgres_database_log }}'
-        state: 'present'
+        state: present

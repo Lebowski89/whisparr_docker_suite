@@ -21,13 +21,13 @@
         group: '{{ whisparr_rclone_docker_plugin_env_pgid }}'
         mode: '0755'
       loop:
-        - '/var/lib/docker-plugins/rclone/config'
-        - '/var/lib/docker-plugins/rclone/cache'
+        - /var/lib/docker-plugins/rclone/config
+        - /var/lib/docker-plugins/rclone/cache
 
     - name: Install docker volume rclone plugin
       community.docker.docker_plugin:
         plugin_name: rclone/docker-volume-rclone:latest
-        alias: 'rclone'
+        alias: rclone
         state: present
 
     - name: Disable docker volume rclone plugin

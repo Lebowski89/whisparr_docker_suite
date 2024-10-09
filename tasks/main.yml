@@ -30,7 +30,7 @@
 
     - name: Include docker install tasks
       when: '"docker-ce" not in ansible_facts.packages'
-      ansible.builtin.include_tasks: 'sub_tasks/docker.yml'
+      ansible.builtin.include_tasks: sub_tasks/docker.yml
 
 ################################
 # CLEAN UP
@@ -124,8 +124,8 @@
       when: whisparr_api_key_is_enabled
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: "/Config/ApiKey"
-        content: "text"
+        xpath: /Config/ApiKey
+        content: text
       register: xml_whisparr_api
 
     - name: Whisparr config.xml | insert existing api key
@@ -134,15 +134,15 @@
         - ((xml_whisparr_api.matches[0].ApiKey is defined) and (xml_whisparr_api.matches[0].ApiKey != whisparr_api_key))
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/ApiKey'
+        xpath: /Config/ApiKey
         value: '{{ whisparr_api_key }}'
 
     - name: Whisparr config.xml | Lookup AuthenticationMethod value
       when: whisparr_authelia_is_enabled
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: "/Config/AuthenticationMethod"
-        content: "text"
+        xpath: /Config/AuthenticationMethod
+        content: text
       register: xml_whisparr_external
 
     - name: Register authelia container
@@ -158,8 +158,8 @@
         - ((xml_whisparr_external.matches[0].AuthenticationMethod is defined) and (xml_whisparr_external.matches[0].AuthenticationMethod != 'External'))
       community.general.xml:
         path: '{{ whisparr_paths_location }}/config.xml'
-        xpath: '/Config/AuthenticationMethod'
-        value: 'External'
+        xpath: /Config/AuthenticationMethod
+        value: External
 
 ################################
 # POSTGRES
@@ -167,15 +167,15 @@
 
 - name: Include postgres container tasks
   when: whisparr_postgres_is_enabled
-  ansible.builtin.include_tasks: 'postgres/postgres_container.yml'
+  ansible.builtin.include_tasks: postgres/postgres_container.yml
 
 - name: Include postgres database tasks
   when: whisparr_postgres_is_enabled
-  ansible.builtin.include_tasks: 'postgres/postgres_database.yml'
+  ansible.builtin.include_tasks: postgres/postgres_database.yml
 
 - name: Include postgres whisparr config.xml tasks
   when: whisparr_postgres_is_enabled
-  ansible.builtin.include_tasks: 'postgres/postgres_config_xml.yml'
+  ansible.builtin.include_tasks: postgres/postgres_config_xml.yml
 
 ################################
 # TRAEFIK
@@ -210,14 +210,14 @@
 
 - name: Include cloudflare tasks
   when: whisparr_cloudflare_is_enabled
-  ansible.builtin.include_tasks: 'sub_tasks/cloudflare.yml'
+  ansible.builtin.include_tasks: sub_tasks/cloudflare.yml
 
 ################################
 # NFS
 ################################
 
 - name: Include nfs tasks
-  ansible.builtin.include_tasks: 'sub_tasks/nfs.yml'
+  ansible.builtin.include_tasks: sub_tasks/nfs.yml
 
 ################################
 # RCLONE
@@ -225,7 +225,7 @@
 
 - name: Include rclone tasks
   when: whisparr_rclone_qbittorrent_is_enabled
-  ansible.builtin.include_tasks: 'sub_tasks/rclone.yml'
+  ansible.builtin.include_tasks: sub_tasks/rclone.yml
 
 ################################
 # THEMEPARK
@@ -241,7 +241,7 @@
 
     - name: Include themepark tasks
       when: not whisparr_themepark_container_result.exists
-      ansible.builtin.include_tasks: 'sub_tasks/themepark.yml'
+      ansible.builtin.include_tasks: sub_tasks/themepark.yml
 
 ################################
 # CONTAINER
