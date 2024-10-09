@@ -47,7 +47,7 @@ whisparr_env_themepark_local:
   TP_SCHEME: 'http'
   TP_DOMAIN: '{{ whisparr_themepark_domain_local }}'
   TP_HOTIO: 'true'
-  TP_THEME: '{{ whisparr_theme }}'
+  TP_THEME: '{{ whisparr_theme_local }}'
 
 whisparr_docker_envs: '{{ whisparr_env_default
                           | combine((whisparr_env_themepark_local
@@ -88,7 +88,7 @@ whisparr_traefik_labels_default:
 whisparr_traefik_labels_router:
   traefik.http.routers.whisparr-rtr.entrypoints: 'http'
   traefik.http.routers.whisparr-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
-  traefik.http.routers.whisparr-rtr.middlewares: 'globalHeaders@file,robotHeaders@file,authelia@docker'
+  traefik.http.routers.whisparr-rtr.middlewares: 'globalHeaders@file,robotHeaders@file,authelia@docker,cloudflarewarp@docker'
   traefik.http.routers.whisparr-rtr.priority: '20'
   traefik.http.routers.whisparr-rtr.service: 'whisparr-rtr-svc'
   traefik.http.services.whisparr-rtr-svc.loadbalancer.server.port: '{{ whisparr_traefik_port }}'
@@ -101,14 +101,14 @@ whisparr_traefik_labels_router:
 whisparr_traefik_labels_router_secure:
   traefik.http.routers.whisparr-rtr-secure.entrypoints: 'https'
   traefik.http.routers.whisparr-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
-  traefik.http.routers.whisparr-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,authelia@docker'
+  traefik.http.routers.whisparr-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,authelia@docker,cloudflarewarp@docker,themepark-whisparr'
   traefik.http.routers.whisparr-rtr-secure.priority: '20'
   traefik.http.routers.whisparr-rtr-secure.service: 'whisparr-rtr-secure-svc'
   traefik.http.routers.whisparr-rtr-secure.tls.certresolver: 'dns-cloudflare'
   traefik.http.routers.whisparr-rtr-secure.tls.options: 'tls-opts@file'
   traefik.http.services.whisparr-rtr-secure-svc.loadbalancer.server.port: '{{ whisparr_traefik_port }}'
   traefik.http.routers.whisparr-api-rtr-secure.entrypoints: 'https'
-  traefik.http.routers.whisparr-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+  traefik.http.routers.whisparr-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,cloudflarewarp@docker'
   traefik.http.routers.whisparr-api-rtr-secure.priority: '30'
   traefik.http.routers.whisparr-api-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
   traefik.http.routers.whisparr-api-rtr-secure.service: 'whisparr-rtr-secure-svc'
@@ -117,7 +117,7 @@ whisparr_traefik_labels_router_secure:
 
 whisparr_traefik_labels_themepark:
   traefik.http.middlewares.themepark-whisparr.plugin.themepark.app: 'whisparr'
-  traefik.http.middlewares.themepark-whisparr.plugin.themepark.theme: '{{ whisparr_theme }}'
+  traefik.http.middlewares.themepark-whisparr.plugin.themepark.theme: '{{ whisparr_theme_traefik }}'
 
 whisparr_traefik_labels: '{{ whisparr_traefik_labels_default
                              | combine(whisparr_traefik_labels_router)
