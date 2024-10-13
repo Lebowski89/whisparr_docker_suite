@@ -1,20 +1,20 @@
 ---
 
-whisparr_rclone_qbittorrent_is_enabled: '{{ (whisparr_rclone_qbittorrent_name is defined) and
-                                            (whisparr_rclone_qbittorrent_name is not none) and
-                                            (whisparr_rclone_qbittorrent_name | trim | length > 0) and
-                                            (whisparr_rclone_qbittorrent_mount_path is defined) and
-                                            (whisparr_rclone_qbittorrent_mount_path is not none) and
-                                            (whisparr_rclone_qbittorrent_mount_path | trim | length > 0) and
-                                            (whisparr_rclone_qbittorrent_host is defined) and
-                                            (whisparr_rclone_qbittorrent_host is not none) and
-                                            (whisparr_rclone_qbittorrent_host | trim | length > 0) and
-                                            (whisparr_rclone_qbittorrent_user is defined) and
-                                            (whisparr_rclone_qbittorrent_user is not none) and
-                                            (whisparr_rclone_qbittorrent_user | trim | length > 0) and
-                                            (whisparr_rclone_qbittorrent_pass is defined) and
-                                            (whisparr_rclone_qbittorrent_pass is not none) and
-                                            (whisparr_rclone_qbittorrent_pass | trim | length > 0) and
-                                            (whisparr_rclone_qbittorrent_key_file_pass is defined) and
-                                            (whisparr_rclone_qbittorrent_key_file_pass is not none) and
-                                            (whisparr_rclone_qbittorrent_key_file_pass | trim | length > 0) }}'
+whisparr_rclone_volume_is_enabled: '{{ (whisparr_rclone_volume_name is defined) and
+                                       (whisparr_rclone_volume_name is not none) and
+                                       (whisparr_rclone_volume_name | trim | length > 0) and
+                                       (whisparr_rclone_volume_mount_path is defined) and
+                                       (whisparr_rclone_volume_mount_path is not none) and
+                                       (whisparr_rclone_volume_mount_path | trim | length > 0) and
+                                       (whisparr_rclone_volume_host is defined) and
+                                       (whisparr_rclone_volume_host is not none) and
+                                       (whisparr_rclone_volume_host | trim | length > 0) and
+                                       (whisparr_rclone_volume_user is defined) and
+                                       (whisparr_rclone_volume_user is not none) and
+                                       (whisparr_rclone_volume_user | trim | length > 0) and
+                                       (whisparr_rclone_volume_pass is defined) and
+                                       (whisparr_rclone_volume_pass is not none) and
+                                       (whisparr_rclone_volume_pass | trim | length > 0) and
+                                       (whisparr_rclone_volume_key_file_pass is defined) and
+                                       (whisparr_rclone_volume_key_file_pass is not none) and
+                                       (whisparr_rclone_volume_key_file_pass | trim | length > 0) }}'

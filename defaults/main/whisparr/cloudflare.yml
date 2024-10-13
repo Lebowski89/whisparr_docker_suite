@@ -1,0 +1,9 @@
+---
+
+################################
+# DNS
+################################
+
+whisparr_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
+whisparr_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
+whisparr_cloudflare_api_token: ''

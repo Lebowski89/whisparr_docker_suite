@@ -20,12 +20,12 @@ whisparr_network_traefik_bind:
   - name: '{{ whisparr_traefik_network }}'
 
 whisparr_docker_networks: '{{ whisparr_network_default_bind
-                              + (whisparr_network_postgres_bind
-                                 if whisparr_postgres_is_enabled
-                                 else [])
-                              + (whisparr_network_traefik_bind
-                                 if whisparr_traefik_is_enabled
-                                 else []) }}'
+                            + (whisparr_network_postgres_bind
+                               if whisparr_toggles_enable_postgres
+                               else [])
+                            + (whisparr_network_traefik_bind
+                               if whisparr_toggles_enable_traefik
+                               else []) }}'
 
 whisparr_network_backend_is_enabled: '{{ (whisparr_network_backend_driver is defined) and
                                          (whisparr_network_backend_driver is not none) and
@@ -47,11 +47,11 @@ whisparr_env_themepark_local:
   TP_SCHEME: 'http'
   TP_DOMAIN: '{{ whisparr_themepark_domain_local }}'
   TP_HOTIO: 'true'
-  TP_THEME: '{{ whisparr_theme_local }}'
+  TP_THEME: '{{ whisparr_themepark_domain_local_theme }}'
 
 whisparr_docker_envs: '{{ whisparr_env_default
                           | combine((whisparr_env_themepark_local
-                                     if whisparr_themepark_local_is_enabled
+                                     if whisparr_toggles_enable_themepark_local
                                      else [])) }}'
 
 ################################
@@ -60,69 +60,75 @@ whisparr_docker_envs: '{{ whisparr_env_default
 
 whisparr_docker_volumes: '{{ whisparr_volumes_binds_default
                              + (whisparr_volumes_binds_themepark
-                                if whisparr_themepark_local_is_enabled
+                                if whisparr_toggles_enable_themepark_local
                                 else [])
-                             + (whisparr_nfs_media_bind
-                                if whisparr_nfs_media_volume_is_enabled
+                             + (whisparr_nfs_volume_bind
+                                if whisparr_toggles_enable_nfs_volume
                                 else [])
-                             + (whisparr_rclone_qbittorrent_bind
-                                if whisparr_rclone_qbittorrent_is_enabled
+                             + (whisparr_rclone_volume_bind
+                                if whisparr_toggles_enable_rclone
                                 else []) }}'
 
 ################################
 # AUTHELIA
 ################################
 
-whisparr_authelia_is_enabled: '{{ (whisparr_authelia_name is defined) and
-                                  (whisparr_authelia_name is not none) and
-                                  (whisparr_authelia_name | trim | length > 0) }}'
+whisparr_authelia_is_enabled: '{{ (whisparr_traefik_authelia_container_name is defined) and
+                                  (whisparr_traefik_authelia_container_name is not none) and
+                                  (whisparr_traefik_authelia_container_name | trim | length > 0) }}'
 
 ################################
 # TRAEFIK
 ################################
 
 whisparr_traefik_labels_default:
-  - traefik.enable: 'true'
-  - traefik.docker.network: '{{ whisparr_traefik_network }}'
+  traefik.enable: 'true'
+  traefik.docker.network: '{{ whisparr_traefik_network }}'
 
 whisparr_traefik_labels_router:
+  ## http
   traefik.http.routers.whisparr-rtr.entrypoints: 'http'
-  traefik.http.routers.whisparr-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
-  traefik.http.routers.whisparr-rtr.middlewares: 'globalHeaders@file,robotHeaders@file,authelia@docker,cloudflarewarp@docker'
-  traefik.http.routers.whisparr-rtr.priority: '20'
+  traefik.http.routers.whisparr-rtr.rule: '{{ whisparr_traefik_http_rule }}'
+  traefik.http.routers.whisparr-rtr.middlewares: '{{ whisparr_traefik_http_middlewares_bind }}'
+  traefik.http.routers.whisparr-rtr.priority: '{{ whisparr_traefik_http_priority }}'
   traefik.http.routers.whisparr-rtr.service: 'whisparr-rtr-svc'
   traefik.http.services.whisparr-rtr-svc.loadbalancer.server.port: '{{ whisparr_traefik_port }}'
+  ## http-api
   traefik.http.routers.whisparr-api-rtr.entrypoints: 'http'
-  traefik.http.routers.whisparr-api-rtr.middlewares: 'globalHeaders@file,robotHeaders@file'
-  traefik.http.routers.whisparr-api-rtr.priority: '30'
-  traefik.http.routers.whisparr-api-rtr.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
+  traefik.http.routers.whisparr-api-rtr.rule: '{{ whisparr_traefik_http_api_rule }}'
+  traefik.http.routers.whisparr-api-rtr.middlewares: '{{ whisparr_traefik_http_api_middlewares_bind }}'
+  traefik.http.routers.whisparr-api-rtr.priority: '{{ whisparr_traefik_http_api_priority }}'
   traefik.http.routers.whisparr-api-rtr.service: 'whisparr-rtr-svc'
 
 whisparr_traefik_labels_router_secure:
+  ## https
   traefik.http.routers.whisparr-rtr-secure.entrypoints: 'https'
-  traefik.http.routers.whisparr-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
-  traefik.http.routers.whisparr-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,authelia@docker,cloudflarewarp@docker,themepark-whisparr'
-  traefik.http.routers.whisparr-rtr-secure.priority: '20'
+  traefik.http.routers.whisparr-rtr-secure.rule: '{{ whisparr_traefik_https_rule }}'
+  traefik.http.routers.whisparr-rtr-secure.middlewares: '{{ whisparr_traefik_https_middlewares_bind }}'
+  traefik.http.routers.whisparr-rtr-secure.priority: '{{ whisparr_traefik_https_priority }}'
   traefik.http.routers.whisparr-rtr-secure.service: 'whisparr-rtr-secure-svc'
-  traefik.http.routers.whisparr-rtr-secure.tls.certresolver: 'dns-cloudflare'
-  traefik.http.routers.whisparr-rtr-secure.tls.options: 'tls-opts@file'
+  traefik.http.routers.whisparr-rtr-secure.tls.certresolver: '{{ whisparr_traefik_tls_certresolver }}'
+  traefik.http.routers.whisparr-rtr-secure.tls.options: '{{ whisparr_traefik_tls_options }}'
   traefik.http.services.whisparr-rtr-secure-svc.loadbalancer.server.port: '{{ whisparr_traefik_port }}'
+  ## https-api
   traefik.http.routers.whisparr-api-rtr-secure.entrypoints: 'https'
-  traefik.http.routers.whisparr-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,cloudflarewarp@docker'
-  traefik.http.routers.whisparr-api-rtr-secure.priority: '30'
-  traefik.http.routers.whisparr-api-rtr-secure.rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`) && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
+  traefik.http.routers.whisparr-api-rtr-secure.rule: '{{ whisparr_traefik_https_api_rule }}'
+  traefik.http.routers.whisparr-api-rtr-secure.middlewares: '{{ whisparr_traefik_https_api_middlewares_bind }}'
+  traefik.http.routers.whisparr-api-rtr-secure.priority: '{{ whisparr_traefik_https_api_priority }}'
   traefik.http.routers.whisparr-api-rtr-secure.service: 'whisparr-rtr-secure-svc'
-  traefik.http.routers.whisparr-api-rtr-secure.tls.certresolver: 'dns-cloudflare'
-  traefik.http.routers.whisparr-api-rtr-secure.tls.options: 'tls-opts@file'
-
+  traefik.http.routers.whisparr-api-rtr-secure.tls.certresolver: '{{ whisparr_traefik_tls_certresolver }}'
+  traefik.http.routers.whisparr-api-rtr-secure.tls.options: '{{ whisparr_traefik_tls_options }}'
+  ## theme-park
 whisparr_traefik_labels_themepark:
   traefik.http.middlewares.themepark-whisparr.plugin.themepark.app: 'whisparr'
-  traefik.http.middlewares.themepark-whisparr.plugin.themepark.theme: '{{ whisparr_theme_traefik }}'
+  traefik.http.middlewares.themepark-whisparr.plugin.themepark.theme: '{{ whisparr_traefik_themepark_theme }}'
 
 whisparr_traefik_labels: '{{ whisparr_traefik_labels_default
                              | combine(whisparr_traefik_labels_router)
                              | combine(whisparr_traefik_labels_router_secure)
-                             | combine(whisparr_traefik_labels_themepark) }}'
+                             | combine((whisparr_traefik_labels_themepark
+                                        if whisparr_toggles_enable_themepark_traefik
+                                        else [])) }}'
 
 whisparr_traefik_is_enabled: '{{ (whisparr_traefik_domain is defined) and
                                  (whisparr_traefik_domain is not none) and
@@ -135,6 +141,35 @@ whisparr_traefik_network_is_enabled: '{{ (whisparr_traefik_network_driver is def
                                          (whisparr_traefik_network_subnet is not none) and
                                          (whisparr_traefik_network_subnet | trim | length > 0) }}'
 
+whisparr_traefik_http_middlewares_bind: '{{ whisparr_traefik_http_middlewares
+                                            + (",cloudflarewarp@docker"
+                                               if (whisparr_toggles_enable_cloudflarewarp)
+                                               else "")
+                                            + (",authelia@docker"
+                                               if (whisparr_toggles_enable_authelia_middleware)
+                                               else "") }}'
+
+whisparr_traefik_http_api_middlewares_bind: '{{ whisparr_traefik_http_api_middlewares
+                                                + (",cloudflarewarp@docker"
+                                                   if (whisparr_toggles_enable_cloudflarewarp)
+                                                   else "") }}'
+
+whisparr_traefik_https_middlewares_bind: '{{ whisparr_traefik_https_middlewares
+                                             + (",cloudflarewarp@docker"
+                                                if (whisparr_toggles_enable_cloudflarewarp)
+                                                else "")
+                                             + (",authelia@docker"
+                                                if (whisparr_toggles_enable_authelia_middleware)
+                                                else "") 
+                                             + (",themepark-whisparr"
+                                                if (whisparr_toggles_enable_themepark_traefik)
+                                                else "") }}'
+
+whisparr_traefik_https_api_middlewares_bind: '{{ whisparr_traefik_https_api_middlewares
+                                                 + (",cloudflarewarp@docker"
+                                                    if (whisparr_toggles_enable_cloudflarewarp)
+                                                    else "") }}'
+
 ################################
 # CLOUDFLARE
 ################################
@@ -145,20 +180,3 @@ whisparr_cloudflare_zone: '{{ whisparr_traefik_domain }}'
 whisparr_cloudflare_is_enabled: '{{ (whisparr_cloudflare_api_token is defined) and
                                     (whisparr_cloudflare_api_token is not none) and
                                     (whisparr_cloudflare_api_token | trim | length > 0) }}'
-
-################################
-# THEME
-################################
-
-whisparr_themepark_local_is_enabled: '{{ (whisparr_themepark_env_timezone is defined) and
-                                         (whisparr_themepark_env_timezone is not none) and
-                                         (whisparr_themepark_env_timezone | trim | length > 0) and
-                                         (whisparr_themepark_env_puid is defined) and
-                                         (whisparr_themepark_env_puid is not none) and
-                                         (whisparr_themepark_env_puid | trim | length > 0) and
-                                         (whisparr_themepark_env_pgid is defined) and
-                                         (whisparr_themepark_env_pgid is not none) and
-                                         (whisparr_themepark_env_pgid | trim | length > 0) and
-                                         (whisparr_themepark_domain_local is defined) and
-                                         (whisparr_themepark_domain_local is not none) and
-                                         (whisparr_themepark_domain_local | trim | length > 0) }}'

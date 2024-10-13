@@ -46,7 +46,7 @@
 
 - name: Modify config.xml with postgres values
   block:
-    - name: whisparr.xml | Adding PostgresUser
+    - name: Whisparr.xml | Adding PostgresUser
       when: ((xml_whisparr_postgresuser.matches[0].PostgresUser is not defined) or
              (xml_whisparr_postgresuser.matches[0].PostgresUser != whisparr_postgres_auth_user ))
       community.general.xml:
@@ -103,7 +103,7 @@
 - name: Clean whisparr appdir
   block:
     - name: Remove sqlite database files
-      when: whisparr_postgres_clean_files
+      when: whisparr_toggles_clean_files
       ansible.builtin.file:
         path: '{{ whisparr_paths_location }}/{{ item }}'
         state: absent
@@ -116,7 +116,7 @@
         - whisparr.db-wal
 
     - name: Remove sqlite backups folder
-      when: whisparr_postgres_clean_folders
+      when: whisparr_toggles_clean_folders
       ansible.builtin.file:
         path: '{{ whisparr_paths_location }}/Backups'
         state: absent

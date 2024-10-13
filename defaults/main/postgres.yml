@@ -15,16 +15,16 @@ whisparr_postgres_basics_restart_policy: 'unless-stopped'
 ################################
 
 whisparr_postgres_network: 'postgres'
-whisparr_postgres_network_driver: ''  ## only required if network doesn't exist
+whisparr_postgres_network_driver: 'bridge'  ## only required if network doesn't exist
 whisparr_postgres_network_subnet: ''  ## only required if network doesn't exist
 
 ################################
 # ENV
 ################################
 
-whisparr_postgres_env_timezone: ''
-whisparr_postgres_env_puid: ''
-whisparr_postgres_env_pgid: ''
+whisparr_postgres_env_timezone: 'Etc/UTC'
+whisparr_postgres_env_puid: '1000'
+whisparr_postgres_env_pgid: '1000'
 
 ################################
 # PORTS
@@ -58,7 +58,7 @@ whisparr_postgres_binds_keys_mapping:
 
 whisparr_postgres_auth_user: ''
 whisparr_postgres_auth_password: ''
-whisparr_postgres_auth_password_file: 'postgres_key.txt'
+whisparr_postgres_auth_password_file: 'postgres_key.txt'  ## will be created by role 
 
 ################################
 # DATABASE
@@ -66,13 +66,3 @@ whisparr_postgres_auth_password_file: 'postgres_key.txt'
 
 whisparr_postgres_database_main: 'whisparr-main'
 whisparr_postgres_database_log: 'whisparr-log'
-
-################################
-# CLEAN
-################################
-
-  ## warning: the below toggles will delete any existing sqlite database files in the whisparr appdir.
-  ## toggle false if you're planning to migrate db data. See: https://wiki.servarr.com/whisparr/postgres-setup
-
-whisparr_postgres_clean_files: false  # true will delete any existing sqlite database files in the whisparr appdir.
-whisparr_postgres_clean_folders: false  # true will delete sqlite backups folder in the whisparr appdir.

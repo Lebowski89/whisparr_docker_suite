@@ -1,0 +1,142 @@
+---
+
+  ## enable or disable role features here
+  ## features still need to meet the 'is_enabled' vars conditionals in order to run
+
+################################
+# DEPENDENCIES
+################################
+
+  ## Toggle whether to install required apt packages during role run
+  ## apt packages include: python3-requests, python3-psycopg2, python3-lxml
+
+whisparr_toggles_enable_apt_packages: true 
+
+################################
+# DOCKER
+################################
+
+  ## Toggle whether to install docker during role run
+  ## Will add dockers gpg key / repository
+  ## apt dependency packages include: ca-certificates, curl
+  ## apt docker packages include: docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin
+
+whisparr_toggles_enable_docker_install: true
+
+################################
+# POSTGRES
+################################
+
+  ## Toggle whether to use Postgres as a database for whisparr
+  ## If enabled, the role will edit whisparr's xml config file with the required Postgres settings
+  ## The role will then ping for an existing Postgres docker container and then create one if none exists
+  ## Finally, the role will use 'community.postgresql.postgresql' modules to ping for an existing database and to create one if none exists
+
+whisparr_toggles_enable_postgres: true
+
+  ## warning: the below toggles will delete any existing sqlite database files in the whisparr appdir.
+  ## toggle false if you're planning to migrate db data. See: https://wiki.servarr.com/whisparr/postgres-setup
+
+whisparr_toggles_clean_files: true  # true will delete any existing sqlite database files in the whisparr appdir.
+whisparr_toggles_clean_folders: true  # true will delete sqlite backups folder in the whisparr appdir.
+
+################################
+# TRAEFIK
+################################
+
+  ## Toggle whether to reverse-proxy whisparr behind Traefik (This role doesn't include setting up Traefik)
+  ## Includes joining whisparr to the Traefik docker network (or creating one if it doesn't exist)
+  ## Includes defining whisparr's Traefik http/https/http-api/https-api router labels
+  ## In this role, the cert-resolver is cloudflare (named: dns-cloudflare) with tls options defined in Traefik's config file (tls-opts@file)
+  ## Various middleware includes: globalHeaders@file,redirect-to-https@docker,robotHeaders@file,secureHeaders@file
+  ## What middleware you use will be up to your needs and how you've set them up and named them within Traefik
+  ## Additional middleware for Authelia, Cloudflare, Theme-park will be defined based on toggles/conditionals (see the toggle section for each)
+
+whisparr_toggles_enable_traefik: true
+
+################################
+# AUTHELIA
+################################
+
+  ## Toggle whether to change whisparr's config.xml authentication setting to 'External'
+  ## This prevents a double login when protecting whisparr with Authelia
+
+whisparr_toggles_enable_external_auth: true
+
+  ## Toggle whether to include Authelia middleware to whisparr's Traefik labels
+  ## Requires setting up Authelia and defining the Authelia middleware in Traefik - this role won't do that for you
+  ## In this role, the Authelia middleware is 'authelia@docker' - change if yours differs
+  ## If enabled, the middleware will be combined with the others you've defined in the defaults variables
+
+whisparr_toggles_enable_authelia_middleware: true
+
+################################
+# CLOUDFLARE
+################################
+
+  ## Toggle whether to use the Ansible 'community.general.cloudflare_dns' module to add a DNS record for whisparr
+  ## By default, this role will add a proxied 'A' record for each, with the use of a cloudflare token (Zone:Read, DNS:Edit)
+  ## It is also possible to use your global api + user email if you desire - this will require changes to the 'community.general.cloudflare_dns' tasks
+  ## See the module documentation on what is required. Personally, I prefer using a dedicated token for Traefik rather than handing over my global API
+  ## This role will remove and add your desired DNS on each run, just in case you've changed your desired sub-domain name, DNS type, or proxy settings
+
+whisparr_toggles_enable_cloudflare_dns: true
+
+  ## Toggle whether to include the cloudflarewarp middleware to whisparr's Traefik labels
+  ## Requires setting up and defining the cloudflarewarp plugin in Traefik - this role won't do that for you
+  ## See the plugin documentation for what it is and what it can do - https://github.com/BetterCorp/cloudflarewarp
+  ## If enabled, the middleware will be combined with the others you've defined in the defaults variables
+
+whisparr_toggles_enable_cloudflarewarp: true
+
+################################
+# THEME-PARK
+################################
+
+  ## Toggle whether to deploy a theme-park docker container to serve themes locally
+  ## This role uses a Hotio whisparr image, so relevant binds/env settings are set up for that
+  ## If you wanted to use a Linuxserver image, you will need to make relevant changes (see Theme-park documentation)
+
+whisparr_toggles_enable_themepark_local: true
+
+  ## Toggle whether to define Theme-Park middleware in whisparr's Traefik labels
+  ## Requires setting up the Theme-Park plugin in Traefik
+  ## In this role, the Theme-Park middleware is named 'themepark-whisparr' - if yours differs, change in vars/whisparr.yml
+
+whisparr_toggles_enable_themepark_traefik: true
+
+  ## Using both allows you to have a themed Traefik when accessing locally and via reverse-proxy, including different themes for each if desired.
+
+################################
+# NFS
+################################
+
+  ## Toggle whether to run the NFS Autofs tasks, which will mount a desired NFS path on the host filesystem
+  ## It's an 'automated' version of the serverbuilds Auto-Mounting guide (https://forums.serverbuilds.net/t/guide-auto-mounting-filesystems-in-linux/1761/92)
+  
+whisparr_toggles_enable_nfs_autofs: true
+  
+  ## Toggle whether to create an NFS docker volume to pass to whisparr. In my case, I pass through my media storage for whisparr to use as the root folder for all music
+  ## NFS support is included natively in the 'community.docker.docker_volume' module, you just need to provide the specific connection/mounting details
+
+whisparr_toggles_enable_nfs_volume: true
+
+  ## May require more/less variables, changes to defaults/tasks/vars depending on your needs, set-up, use-case. For mounting a media folder via NFS? it should be good to go 
+
+################################
+# RCLONE
+################################
+
+  ## Toggle whether to run the RCLONE tasks, including installing the rclone docker volume plugin and the creation of a SFTP docker volume
+  ## The installation and set-up of the plugin is an 'automated' version of the instructions listed here: https://rclone.org/docker/
+  ## By default, the role includes the option of setting up an SFTP rclone docker volume to attach to whisparr
+  ## This is specific/niche to my needs, where I have my download client + unpackerr on a remote server with the download folder mounted locally via the rclone volume
+  ## I then attach the volume to whisparr and use the 'Remote Path Mappings' within whisparr to line-up the remote and local paths
+  ## By default, metrics and rclone webui are setup along with the plugin - enabling simple monitoring via the webui and more advanced monitoring with a prometheus/grafana set-up
+
+whisparr_toggles_enable_rclone: true
+
+  ## Note: If you do wish to have a similar set-up, you will probably want to use Unpackerr on the remote server alongside your download client
+  ## Unpackerr will make sure any archived downloads are fully extracted before whisparr tries importing. Without this, whisparr will mark an incomplete file as successfully imported
+
+  ## Those wanting to mount a gdrive, or some other cloud storage type, will need to make changes to the rclone defaults/tasks/vars depending on your needs, set-up, use-case. For me, a simple SFTP mount is what I need

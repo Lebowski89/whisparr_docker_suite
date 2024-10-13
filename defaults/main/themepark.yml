@@ -13,19 +13,18 @@ whisparr_themepark_basics_restart_policy: 'unless-stopped'
 # ENV
 ################################
 
-whisparr_themepark_env_timezone: ''
-whisparr_themepark_env_puid: ''
-whisparr_themepark_env_pgid: ''
+whisparr_themepark_env_timezone: 'Etc/UTC'
+whisparr_themepark_env_puid: '1000'
+whisparr_themepark_env_pgid: '1000'
 
 ################################
 # DOMAIN (LOCAL)
 ################################
 
-  ## Fill if wanting themes served locally via http on local network.
-  ## Will deploy theme-park in a docker container.
   ## Must be accessible to your browser - try: '<local_machine_ip>:{{ whisparr_themepark_ports_host }}'
 
 whisparr_themepark_domain_local: ''
+whisparr_themepark_domain_local_theme: 'hotline'  ## theme to use for local theme-park deployment
 
 ################################
 # PORTS

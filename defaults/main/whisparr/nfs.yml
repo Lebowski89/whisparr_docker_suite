@@ -1,0 +1,34 @@
+---
+
+################################
+# ENV
+################################
+
+whisparr_nfs_env_puid: '1000'
+whisparr_nfs_env_pgid: '1000'
+
+################################
+# AUTOFS
+################################
+
+whisparr_autofs_mount_host_address: ''
+whisparr_autofs_mount_remote_path: ''
+whisparr_autofs_mount_local_dir_name: ''
+whisparr_autofs_mount_opt: '-fstype=nfs,port=2049,rw,timeo=100,noatime'
+
+################################
+# DOCKER VOLUME
+################################
+
+whisparr_nfs_volume_name: ''
+whisparr_nfs_volume_address: ''
+whisparr_nfs_volume_device: ''
+whisparr_nfs_volume_permissions: 'rw'
+whisparr_nfs_volume_version: '4'
+
+################################
+# BINDS
+################################
+
+whisparr_nfs_volume_bind:
+  - '{{ whisparr_nfs_volume_name }}:/data'

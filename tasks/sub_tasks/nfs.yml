@@ -1,7 +1,9 @@
 ---
 
 - name: Perform autofs media mount tasks
-  when: whisparr_autofs_media_mount_is_enabled
+  when:
+    - whisparr_toggles_enable_nfs_autofs
+    - whisparr_autofs_mount_is_enabled
   block:
     - name: Install autofs
       when: ansible_os_family == 'Debian'
@@ -33,7 +35,7 @@
     - name: Add mount to auto.nfsdb file
       ansible.builtin.lineinfile:
         dest: '{{ whisparr_autofs_nfsdb_file }}'
-        line: '{{ whisparr_autofs_media_mount_local_dir_name }} {{ whisparr_autofs_media_mount_opt }} {{ whisparr_autofs_media_mount_host_address }}:{{ whisparr_autofs_media_mount_remote_path }}'
+        line: '{{ whisparr_autofs_mount_local_dir_name }} {{ whisparr_autofs_mount_opt }} {{ whisparr_autofs_mount_host_address }}:{{ whisparr_autofs_mount_remote_path }}'
         state: present
         create: true
         owner: '{{ whisparr_nfs_env_puid }}'
@@ -43,15 +45,17 @@
         - redo mounts
 
 - name: Create whisparr nfs media volume
-  when: whisparr_nfs_media_volume_is_enabled
+  when: 
+    - whisparr_toggles_enable_nfs_volume
+    - whisparr_nfs_volume_is_enabled
   block:
-    - name: Create whisparr media nfs volume
+    - name: Create whisparr nfs volume
       community.docker.docker_volume:
-        volume_name: '{{ whisparr_nfs_media_name }}'
+        volume_name: '{{ whisparr_nfs_volume_name }}'
         state: present
         recreate: options-changed
         driver: local
         driver_options:
           type: nfs
-          o: 'addr={{ whisparr_nfs_media_address }},{{ whisparr_nfs_media_permissions }},nfsvers={{ whisparr_nfs_media_version }}'
-          device: '{{ whisparr_nfs_media_device }}'
+          o: 'addr={{ whisparr_nfs_volume_address }},{{ whisparr_nfs_volume_permissions }},nfsvers={{ whisparr_nfs_volume_version }}'
+          device: '{{ whisparr_nfs_volume_device }}'

@@ -1,0 +1,71 @@
+---
+
+################################
+# DOMAIN
+################################
+
+whisparr_traefik_subdomain:
+whisparr_traefik_domain:
+whisparr_traefik_port: '6969'
+
+################################
+# NETWORK
+################################
+
+whisparr_traefik_network: 'traefik_proxy'
+whisparr_traefik_network_driver: 'bridge'  ## only required if network doesn't exist
+whisparr_traefik_network_subnet: ''  ## only required if network doesn't exist
+
+################################
+# TLS
+################################
+
+whisparr_traefik_tls_certresolver: 'dns-cloudflare'
+whisparr_traefik_tls_options: 'tls-opts@file'
+
+################################
+# ROUTER (HTTP)
+################################
+
+  ## http
+whisparr_traefik_http_middlewares: 'globalHeaders@file,redirect-to-https@docker,robotHeaders@file'
+whisparr_traefik_http_rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
+whisparr_traefik_http_priority: '20'
+
+  ## http-api
+whisparr_traefik_http_api_middlewares: 'globalHeaders@file,redirect-to-https@docker,robotHeaders@file'
+whisparr_traefik_http_api_rule: '{{ whisparr_traefik_http_rule }} && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
+whisparr_traefik_http_api_priority: '30'
+
+################################
+# ROUTER (HTTPS)
+################################
+
+  ## https
+whisparr_traefik_https_middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+whisparr_traefik_https_rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_traefik_domain }}`)'
+whisparr_traefik_https_priority: '20'
+
+  ## https-api
+whisparr_traefik_https_api_middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+whisparr_traefik_https_api_rule: '{{ whisparr_traefik_https_rule }} && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
+whisparr_traefik_https_api_priority: '30'
+
+################################
+# AUTHELIA
+################################
+
+whisparr_traefik_authelia_container_name: 'authelia'
+whisparr_traefik_authelia_middleware: 'authelia@docker'
+
+################################
+# CLOUDFLARE
+################################
+
+whisparr_traefik_cloudflare_middleware: 'cloudflarewarp@docker'
+
+################################
+# THEME-PARK
+################################
+
+whisparr_traefik_themepark_theme: 'hotpink'

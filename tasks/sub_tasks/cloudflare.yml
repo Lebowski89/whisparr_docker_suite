@@ -1,9 +1,5 @@
 ---
 
-################################
-# whisparr
-################################
-
 - name: Remove existing CNAME DNS record
   community.general.cloudflare_dns:
     api_token: '{{ whisparr_cloudflare_api_token }}'
