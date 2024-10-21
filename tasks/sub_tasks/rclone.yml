@@ -1,8 +1,8 @@
 ---
 
-- name: Register whisparr rclone volume volume
+- name: Register rclone volume
   community.docker.docker_volume_info:
-    name: '{{ whisparr_rclone_volume_name }}'
+    name: '{{ lookup("vars", role_prefix + "_rclone_volume_name") }}'
   register: whisparr_rclone_volume_initial_volume_result
 
 - name: Perform rclone docker volume creation tasks
@@ -17,8 +17,8 @@
       ansible.builtin.file:
         path: '{{ item }}'
         state: directory
-        owner: '{{ whisparr_rclone_docker_plugin_env_puid }}'
-        group: '{{ whisparr_rclone_docker_plugin_env_pgid }}'
+        owner: '{{ lookup("vars", role_prefix + "_rclone_docker_plugin_env_puid") }}'
+        group: '{{ lookup("vars", role_prefix + "_rclone_docker_plugin_env_pgid") }}'
         mode: '0755'
       loop:
         - /var/lib/docker-plugins/rclone/config
@@ -36,7 +36,7 @@
         state: disable
 
     - name: Apply rclone docker plugin global arguments
-      ansible.builtin.command: 'docker plugin set rclone RCLONE_VERBOSE=2 args={{ whisparr_rclone_docker_plugin_global_args | quote }}'
+      ansible.builtin.command: 'docker plugin set rclone RCLONE_VERBOSE=2 args={{ lookup("vars", role_prefix + "_rclone_docker_plugin_global_args") | quote }}'
 
     - name: Enable docker volume rclone plugin
       community.docker.docker_plugin:
@@ -47,27 +47,27 @@
     - name: Check if rclone.conf exists
       ansible.builtin.stat:
         path: /var/lib/docker-plugins/rclone/config/rclone.conf
-      register: rclone_config_result
+      register: whisparr_rclone_config_result
 
     - name: Create rclone.conf file
-      when: not rclone_config_result.stat.exists
+      when: not whisparr_rclone_config_result.stat.exists
       ansible.builtin.file:
         path: /var/lib/docker-plugins/rclone/config/rclone.conf
         state: touch
-        owner: '{{ whisparr_rclone_docker_plugin_env_puid }}'
-        group: '{{ whisparr_rclone_docker_plugin_env_pgid }}'
+        owner: '{{ lookup("vars", role_prefix + "_rclone_docker_plugin_env_puid") }}'
+        group: '{{ lookup("vars", role_prefix + "_rclone_docker_plugin_env_pgid") }}'
         mode: '0644'
 
     - name: Create sftp rclone volume
       community.docker.docker_volume:
-        name: '{{ whisparr_rclone_volume_name }}'
+        name: '{{ lookup("vars", role_prefix + "_rclone_volume_name") }}'
         driver: rclone
         driver_options:
-          type: '{{ whisparr_rclone_volume_type }}'
-          path: '{{ whisparr_rclone_volume_mount_path }}'
-          sftp-host: '{{ whisparr_rclone_volume_host }}'
-          sftp-user: '{{ whisparr_rclone_volume_user }}'
-          sftp-pass: '{{ whisparr_rclone_volume_pass }}'
-          sftp-key-file-pass: '{{ whisparr_rclone_volume_key_file_pass }}'
+          type: '{{ lookup("vars", role_prefix + "_rclone_volume_type") }}'
+          path: '{{ lookup("vars", role_prefix + "_rclone_volume_mount_path") }}'
+          sftp-host: '{{ lookup("vars", role_prefix + "_rclone_volume_host") }}'
+          sftp-user: '{{ lookup("vars", role_prefix + "_rclone_volume_user") }}'
+          sftp-pass: '{{ lookup("vars", role_prefix + "_rclone_volume_pass") }}'
+          sftp-key-file-pass: '{{ lookup("vars", role_prefix + "_rclone_volume_key_file_pass") }}'
           allow_other: 'true'
           vfs_cache_mode: 'off'

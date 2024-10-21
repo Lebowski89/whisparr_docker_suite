@@ -2,83 +2,83 @@
 
 - name: Create postgres appdata directory
   ansible.builtin.file:
-    path: '{{ whisparr_postgres_paths_location }}'
+    path: '{{ lookup("vars", role_prefix + "_postgres_paths_location") }}'
     state: directory
-    owner: '{{ whisparr_postgres_env_puid }}'
-    group: '{{ whisparr_postgres_env_pgid }}'
+    owner: '{{ lookup("vars", role_prefix + "_postgres_env_puid") }}'
+    group: '{{ lookup("vars", role_prefix + "_postgres_env_pgid") }}'
     mode: '0755'
 
 - name: Create postgres keys directory
   ansible.builtin.file:
-    path: '{{ whisparr_postgres_paths_keys_location }}'
+    path: '{{ lookup("vars", role_prefix + "_postgres_paths_keys_location") }}'
     state: directory
-    owner: '{{ whisparr_postgres_env_puid }}'
-    group: '{{ whisparr_postgres_env_pgid }}'
+    owner: '{{ lookup("vars", role_prefix + "_postgres_env_puid") }}'
+    group: '{{ lookup("vars", role_prefix + "_postgres_env_pgid") }}'
     mode: '0755'
 
 - name: Check if postgres_key.txt exists
   ansible.builtin.stat:
-    path: '{{ whisparr_postgres_paths_keys_location }}/{{ whisparr_postgres_auth_password_file }}'
+    path: '{{ lookup("vars", role_prefix + "_postgres_paths_keys_location") }}/{{ lookup("vars", role_prefix + "_postgres_auth_password_file") }}'
   register: whisparr_postgres_key_txt
 
 - name: Insert postgres password into password file
   when: not whisparr_postgres_key_txt.stat.exists
   ansible.builtin.lineinfile:
-    path: '{{ whisparr_postgres_paths_keys_location }}/{{ whisparr_postgres_auth_password_file }}'
-    line: '{{ whisparr_postgres_auth_password }}'
-    owner: '{{ whisparr_postgres_env_puid }}'
-    group: '{{ whisparr_postgres_env_pgid }}'
+    path: '{{ lookup("vars", role_prefix + "_postgres_paths_keys_location") }}/{{ lookup("vars", role_prefix + "_postgres_auth_password_file") }}'
+    line: '{{ lookup("vars", role_prefix + "_postgres_auth_password") }}'
+    owner: '{{ lookup("vars", role_prefix + "_postgres_env_puid") }}'
+    group: '{{ lookup("vars", role_prefix + "_postgres_env_pgid") }}'
     mode: '0644'
     create: true
 
 - name: Register postgres network
   community.docker.docker_network_info:
-    name: '{{ whisparr_postgres_network }}'
+    name: '{{ lookup("vars", role_prefix + "_postgres_network") }}'
   register: whisparr_postgres_network_result
 
 - name: Postgres network builtin fail
   ansible.builtin.fail:
     msg: Postgres network does not exist nor is it enabled. Ensure the Postgres network variables contain valid entries.
   when:
-    - not whisparr_postgres_network_is_enabled
+    - not (lookup("vars", role_prefix + "_postgres_network_is_enabled"))
     - not whisparr_postgres_network_result.exists
 
 - name: Create postgres network
   when: not whisparr_postgres_network_result.exists
   community.docker.docker_network:
-    name: '{{ whisparr_postgres_network }}'
-    driver: '{{ whisparr_postgres_network_driver }}'
+    name: '{{ lookup("vars", role_prefix + "_postgres_network") }}'
+    driver: '{{ lookup("vars", role_prefix + "_postgres_network_driver") }}'
     ipam_config:
-      - subnet: '{{ whisparr_postgres_network_subnet }}'
+      - subnet: '{{ lookup("vars", role_prefix + "_postgres_network_subnet") }}'
 
 - name: Register postgres container
   community.docker.docker_container_info:
-    name: '{{ whisparr_postgres_basics_name }}'
+    name: '{{ lookup("vars", role_prefix + "_postgres_basics_name") }}'
   register: whisparr_postgres_container_result
 
 - name: Create postgres container
   when: not whisparr_postgres_container_result.exists
   community.docker.docker_container:
-    name: '{{ whisparr_postgres_basics_name }}'
-    image: '{{ whisparr_postgres_basics_image_repo }}:{{ whisparr_postgres_basics_image_tag }}'
+    name: '{{ lookup("vars", role_prefix + "_postgres_basics_name") }}'
+    image: '{{ lookup("vars", role_prefix + "_postgres_basics_image_repo") }}:{{ lookup("vars", role_prefix + "_postgres_basics_image_tag") }}'
     networks:
-      - name: '{{ whisparr_postgres_network }}'
+      - name: '{{ lookup("vars", role_prefix + "_postgres_network") }}'
     env:
-      PUID: '{{ whisparr_postgres_env_puid }}'
-      PGID: '{{ whisparr_postgres_env_pgid }}'
-      TZ: '{{ whisparr_postgres_env_timezone }}'
-      POSTGRES_USER: '{{ whisparr_postgres_auth_user }}'
-      POSTGRES_PASSWORD_FILE: '/keys/{{ whisparr_postgres_auth_password_file }}'
+      PUID: '{{ lookup("vars", role_prefix + "_postgres_env_puid") }}'
+      PGID: '{{ lookup("vars", role_prefix + "_postgres_env_pgid") }}'
+      TZ: '{{ lookup("vars", role_prefix + "_postgres_env_timezone") }}'
+      POSTGRES_USER: '{{ lookup("vars", role_prefix + "_postgres_auth_user") }}'
+      POSTGRES_PASSWORD_FILE: '/keys/{{ lookup("vars", role_prefix + "_postgres_auth_password_file") }}'
     ports:
-      - '{{ whisparr_postgres_ports_host }}:{{ whisparr_postgres_ports_cont }}'
-    volumes: '{{ whisparr_postgres_binds }}'
-    restart_policy: '{{ whisparr_postgres_basics_restart_policy }}'
+      - '{{ lookup("vars", role_prefix + "_postgres_ports_host") }}:{{ lookup("vars", role_prefix + "_postgres_ports_cont") }}'
+    volumes: '{{ lookup("vars", role_prefix + "_postgres_binds") }}'
+    restart_policy: '{{ lookup("vars", role_prefix + "_postgres_basics_restart_policy") }}'
 
 - name: Make sure the postgres container is started
   community.docker.docker_container:
-    name: '{{ whisparr_postgres_basics_name }}'
+    name: '{{ lookup("vars", role_prefix + "_postgres_basics_name") }}'
     state: started
-  register: start_whisparr_postgres_docker
+  register: whisparr_start_postgres_docker
   retries: 5
   delay: 10
-  until: start_whisparr_postgres_docker is succeeded
+  until: whisparr_start_postgres_docker is succeeded

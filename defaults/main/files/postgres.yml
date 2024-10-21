@@ -39,8 +39,7 @@ whisparr_postgres_ports_cont: '5432'
 
 whisparr_postgres_paths_folder: '{{ whisparr_postgres_basics_name }}'  # name of postgres folder
 whisparr_postgres_paths_location: '/opt/{{ whisparr_postgres_paths_folder }}' # path of postgres folder
-whisparr_postgres_paths_keys_folder: 'keys'
-whisparr_postgres_paths_keys_location: '{{ whisparr_postgres_paths_location }}/{{ whisparr_postgres_paths_keys_folder }}'
+whisparr_postgres_paths_keys_location: '{{ whisparr_postgres_paths_location }}/keys'
 
 ################################
 # BINDS
@@ -66,3 +65,7 @@ whisparr_postgres_auth_password_file: 'postgres_key.txt'  ## will be created by 
 
 whisparr_postgres_database_main: 'whisparr-main'
 whisparr_postgres_database_log: 'whisparr-log'
+
+
+
+

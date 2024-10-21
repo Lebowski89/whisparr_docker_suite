@@ -19,13 +19,13 @@ whisparr_network_postgres_bind:
 whisparr_network_traefik_bind:
   - name: '{{ whisparr_traefik_network }}'
 
-whisparr_docker_networks: '{{ whisparr_network_default_bind
-                            + (whisparr_network_postgres_bind
-                               if whisparr_toggles_enable_postgres
-                               else [])
-                            + (whisparr_network_traefik_bind
-                               if whisparr_toggles_enable_traefik
-                               else []) }}'
+whisparr_networks: '{{ whisparr_network_default_bind
+                       + (whisparr_network_postgres_bind
+                          if whisparr_toggles_enable_postgres
+                          else [])
+                       + (whisparr_network_traefik_bind
+                          if whisparr_toggles_enable_traefik
+                          else []) }}'
 
 whisparr_network_backend_is_enabled: '{{ (whisparr_network_backend_driver is defined) and
                                          (whisparr_network_backend_driver is not none) and
@@ -49,33 +49,44 @@ whisparr_env_themepark_local:
   TP_HOTIO: 'true'
   TP_THEME: '{{ whisparr_themepark_domain_local_theme }}'
 
-whisparr_docker_envs: '{{ whisparr_env_default
-                          | combine((whisparr_env_themepark_local
-                                     if whisparr_toggles_enable_themepark_local
-                                     else [])) }}'
+whisparr_envs: '{{ whisparr_env_default
+                   | combine((whisparr_env_themepark_local
+                              if whisparr_toggles_enable_themepark_local
+                              else [])) }}'
+              
+################################
+# LABELS
+################################
+
+whisparr_labels: '{{ whisparr_traefik_labels_default
+                     | combine(whisparr_traefik_labels_router)
+                     | combine(whisparr_traefik_labels_router_secure)
+                     | combine((whisparr_traefik_labels_themepark
+                                if whisparr_toggles_enable_themepark_traefik
+                                else [])) }}'
 
 ################################
 # BINDS
 ################################
 
-whisparr_docker_volumes: '{{ whisparr_volumes_binds_default
-                             + (whisparr_volumes_binds_themepark
-                                if whisparr_toggles_enable_themepark_local
-                                else [])
-                             + (whisparr_nfs_volume_bind
-                                if whisparr_toggles_enable_nfs_volume
-                                else [])
-                             + (whisparr_rclone_volume_bind
-                                if whisparr_toggles_enable_rclone
-                                else []) }}'
+whisparr_volumes: '{{ whisparr_volumes_binds_default
+                      + (whisparr_volumes_binds_themepark
+                         if whisparr_toggles_enable_themepark_local
+                         else [])
+                      + (whisparr_nfs_volume_bind
+                         if whisparr_toggles_enable_nfs_volume
+                         else [])
+                      + (whisparr_rclone_volume_bind
+                         if whisparr_toggles_enable_rclone
+                         else []) }}'
 
 ################################
 # AUTHELIA
 ################################
 
-whisparr_authelia_is_enabled: '{{ (whisparr_traefik_authelia_container_name is defined) and
-                                  (whisparr_traefik_authelia_container_name is not none) and
-                                  (whisparr_traefik_authelia_container_name | trim | length > 0) }}'
+whisparr_authelia_is_enabled: '{{ (whisparr_authelia_container_name is defined) and
+                                  (whisparr_authelia_container_name is not none) and
+                                  (whisparr_authelia_container_name | trim | length > 0) }}'
 
 ################################
 # TRAEFIK
@@ -123,13 +134,6 @@ whisparr_traefik_labels_themepark:
   traefik.http.middlewares.themepark-whisparr.plugin.themepark.app: 'whisparr'
   traefik.http.middlewares.themepark-whisparr.plugin.themepark.theme: '{{ whisparr_traefik_themepark_theme }}'
 
-whisparr_traefik_labels: '{{ whisparr_traefik_labels_default
-                             | combine(whisparr_traefik_labels_router)
-                             | combine(whisparr_traefik_labels_router_secure)
-                             | combine((whisparr_traefik_labels_themepark
-                                        if whisparr_toggles_enable_themepark_traefik
-                                        else [])) }}'
-
 whisparr_traefik_is_enabled: '{{ (whisparr_traefik_domain is defined) and
                                  (whisparr_traefik_domain is not none) and
                                  (whisparr_traefik_domain | trim | length > 0) }}'
@@ -173,9 +177,6 @@ whisparr_traefik_https_api_middlewares_bind: '{{ whisparr_traefik_https_api_midd
 ################################
 # CLOUDFLARE
 ################################
-
-whisparr_cloudflare_record: '{{ whisparr_traefik_subdomain }}'
-whisparr_cloudflare_zone: '{{ whisparr_traefik_domain }}'
 
 whisparr_cloudflare_is_enabled: '{{ (whisparr_cloudflare_api_token is defined) and
                                     (whisparr_cloudflare_api_token is not none) and

@@ -47,4 +47,3 @@ whisparr_themepark_paths_location: '/opt/{{ whisparr_themepark_paths_folder }}'
 whisparr_themepark_bind_mount:
   - '{{ whisparr_themepark_paths_location }}:/config'
 
-

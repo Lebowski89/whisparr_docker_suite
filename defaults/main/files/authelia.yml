@@ -1,0 +1,7 @@
+---
+
+################################
+# AUTHELIA
+################################
+
+whisparr_authelia_container_name: 'authelia'
