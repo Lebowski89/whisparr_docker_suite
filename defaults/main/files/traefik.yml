@@ -32,7 +32,7 @@ whisparr_traefik_http_rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr_
 whisparr_traefik_http_priority: '20'
 
 whisparr_traefik_http_api_middlewares: 'globalHeaders@file,redirect-to-https@docker,autodetect@docker,gzip@docker,robotHeaders@file'
-whisparr_traefik_http_api_rule: '{{ whisparr_traefik_http_rule }} && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
+whisparr_traefik_http_api_rule: '{{ whisparr_traefik_http_rule + " && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))" }}'
 whisparr_traefik_http_api_priority: '30'
 
 ################################
@@ -44,7 +44,7 @@ whisparr_traefik_https_rule: 'Host(`{{ whisparr_traefik_subdomain }}.{{ whisparr
 whisparr_traefik_https_priority: '20'
 
 whisparr_traefik_https_api_middlewares: 'globalHeaders@file,secureHeaders@file,autodetect@docker,gzip@docker,robotHeaders@file,hsts@file'
-whisparr_traefik_https_api_rule: '{{ whisparr_traefik_https_rule }} && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))'
+whisparr_traefik_https_api_rule: '{{ whisparr_traefik_https_rule + " && (PathPrefix(`/api`) || PathPrefix(`/feed`) || PathPrefix(`/ping`))" }}'
 whisparr_traefik_https_api_priority: '30'
 
 ################################
