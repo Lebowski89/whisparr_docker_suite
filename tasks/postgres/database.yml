@@ -4,20 +4,20 @@
   block:
     - name: Ping for existing main database
       community.postgresql.postgresql_ping:
-        login_host: '{{ lookup("vars", role_prefix + "_postgres_basics_host") }}'
-        login_user: '{{ lookup("vars", role_prefix + "_postgres_auth_user") }}'
-        login_password: '{{ lookup("vars", role_prefix + "_postgres_auth_password") }}'
-        port: '{{ lookup("vars", role_prefix + "_postgres_ports_host") }}'
-        db: '{{ lookup("vars", role_prefix + "_postgres_database_main") }}'
+        login_host: '{{ lookup("vars", whisparr_prefix + "_postgres_basics_host") }}'
+        login_user: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_user") }}'
+        login_password: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_password") }}'
+        port: '{{ lookup("vars", whisparr_prefix + "_postgres_ports_host") }}'
+        db: '{{ lookup("vars", whisparr_prefix + "_postgres_database_main") }}'
       register: whisparr_postgres_maindb
 
     - name: Ping for existing log database
       community.postgresql.postgresql_ping:
-        login_host: '{{ lookup("vars", role_prefix + "_postgres_basics_host") }}'
-        login_user: '{{ lookup("vars", role_prefix + "_postgres_auth_user") }}'
-        login_password: '{{ lookup("vars", role_prefix + "_postgres_auth_password") }}'
-        port: '{{ lookup("vars", role_prefix + "_postgres_ports_host") }}'
-        db: '{{ lookup("vars", role_prefix + "_postgres_database_log") }}'
+        login_host: '{{ lookup("vars", whisparr_prefix + "_postgres_basics_host") }}'
+        login_user: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_user") }}'
+        login_password: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_password") }}'
+        port: '{{ lookup("vars", whisparr_prefix + "_postgres_ports_host") }}'
+        db: '{{ lookup("vars", whisparr_prefix + "_postgres_database_log") }}'
       register: whisparr_postgres_logdb
 
 - name: Create postgres databases
@@ -25,19 +25,19 @@
     - name: Create postgres main database
       when: not whisparr_postgres_maindb == true
       community.postgresql.postgresql_db:
-        login_host: '{{ lookup("vars", role_prefix + "_postgres_basics_host") }}'
-        login_user: '{{ lookup("vars", role_prefix + "_postgres_auth_user") }}'
-        login_password: '{{ lookup("vars", role_prefix + "_postgres_auth_password") }}'
-        port: '{{ lookup("vars", role_prefix + "_postgres_ports_host") }}'
-        name: '{{ lookup("vars", role_prefix + "_postgres_database_main") }}'
+        login_host: '{{ lookup("vars", whisparr_prefix + "_postgres_basics_host") }}'
+        login_user: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_user") }}'
+        login_password: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_password") }}'
+        port: '{{ lookup("vars", whisparr_prefix + "_postgres_ports_host") }}'
+        name: '{{ lookup("vars", whisparr_prefix + "_postgres_database_main") }}'
         state: present
 
     - name: Create postgres log database
       when: not whisparr_postgres_logdb == true
       community.postgresql.postgresql_db:
-        login_host: '{{ lookup("vars", role_prefix + "_postgres_basics_host") }}'
-        login_user: '{{ lookup("vars", role_prefix + "_postgres_auth_user") }}'
-        login_password: '{{ lookup("vars", role_prefix + "_postgres_auth_password") }}'
-        port: '{{ lookup("vars", role_prefix + "_postgres_ports_host") }}'
-        name: '{{ lookup("vars", role_prefix + "_postgres_database_log") }}'
+        login_host: '{{ lookup("vars", whisparr_prefix + "_postgres_basics_host") }}'
+        login_user: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_user") }}'
+        login_password: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_password") }}'
+        port: '{{ lookup("vars", whisparr_prefix + "_postgres_ports_host") }}'
+        name: '{{ lookup("vars", whisparr_prefix + "_postgres_database_log") }}'
         state: present

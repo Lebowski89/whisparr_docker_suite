@@ -4,42 +4,42 @@
   block:
     - name: Lookup PostgresUser value
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         xpath: /Config/PostgresUser
         print_match: true
       register: whisparr_xml_postgresuser
 
     - name: Lookup PostgresPassword value
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         xpath: /Config/PostgresPassword
         print_match: true
       register: whisparr_xml_postgrespassword
 
     - name: Lookup PostgresPort value
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         xpath: /Config/PostgresPort
         print_match: true
       register: whisparr_xml_postgresport
 
     - name: Lookup PostgresHost value
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         xpath: /Config/PostgresHost
         print_match: true
       register: whisparr_xml_postgreshost
 
     - name: Lookup PostgresMainDb value
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         xpath: /Config/PostgresMainDb
         print_match: true
       register: whisparr_xml_postgresmaindb
 
     - name: Lookup PostgresLogDb value
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         xpath: /Config/PostgresLogDb
         print_match: true
       register: whisparr_xml_postgreslogdb
@@ -48,64 +48,64 @@
   block:
     - name: Adding PostgresUser
       when: ((whisparr_xml_postgresuser.matches[0].PostgresUser is not defined) or
-             (whisparr_xml_postgresuser.matches[0].PostgresUser != lookup("vars", role_prefix + "_postgres_auth_user") ))
+             (whisparr_xml_postgresuser.matches[0].PostgresUser != lookup("vars", whisparr_prefix + "_postgres_auth_user") ))
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         pretty_print: true
         xpath: /Config/PostgresUser
-        value: '{{ lookup("vars", role_prefix + "_postgres_auth_user") }}'
+        value: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_user") }}'
 
     - name: Adding PostgresPassword
       when: ((whisparr_xml_postgrespassword.matches[0].PostgresPassword is not defined) or
-             (whisparr_xml_postgrespassword.matches[0].PostgresPassword != lookup("vars", role_prefix + "_postgres_auth_password") ))
+             (whisparr_xml_postgrespassword.matches[0].PostgresPassword != lookup("vars", whisparr_prefix + "_postgres_auth_password") ))
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         pretty_print: true
         xpath: /Config/PostgresPassword
-        value: '{{ lookup("vars", role_prefix + "_postgres_auth_password") }}'
+        value: '{{ lookup("vars", whisparr_prefix + "_postgres_auth_password") }}'
 
     - name: Adding PostgresPort
       when: ((whisparr_xml_postgresport.matches[0].PostgresPort is not defined) or
-             (whisparr_xml_postgresport.matches[0].PostgresPort != lookup("vars", role_prefix + "_postgres_ports_cont") ))
+             (whisparr_xml_postgresport.matches[0].PostgresPort != lookup("vars", whisparr_prefix + "_postgres_ports_cont") ))
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         pretty_print: true
         xpath: /Config/PostgresPort
-        value: '{{ lookup("vars", role_prefix + "_postgres_ports_cont") }}'
+        value: '{{ lookup("vars", whisparr_prefix + "_postgres_ports_cont") }}'
 
     - name: Adding PostgresHost
       when: ((whisparr_xml_postgreshost.matches[0].PostgresHost is not defined) or
-             (whisparr_xml_postgreshost.matches[0].PostgresHost != lookup("vars", role_prefix + "_postgres_basics_name") ))
+             (whisparr_xml_postgreshost.matches[0].PostgresHost != lookup("vars", whisparr_prefix + "_postgres_basics_name") ))
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         pretty_print: true
         xpath: /Config/PostgresHost
-        value: '{{ lookup("vars", role_prefix + "_postgres_basics_name") }}'
+        value: '{{ lookup("vars", whisparr_prefix + "_postgres_basics_name") }}'
 
     - name: Adding PostgresMainDb
       when: ((whisparr_xml_postgresmaindb.matches[0].PostgresMainDb is not defined) or
-             (whisparr_xml_postgresmaindb.matches[0].PostgresMainDb != lookup("vars", role_prefix + "_postgres_database_main") ))
+             (whisparr_xml_postgresmaindb.matches[0].PostgresMainDb != lookup("vars", whisparr_prefix + "_postgres_database_main") ))
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         pretty_print: true
         xpath: /Config/PostgresMainDb
-        value: '{{ lookup("vars", role_prefix + "_postgres_database_main") }}'
+        value: '{{ lookup("vars", whisparr_prefix + "_postgres_database_main") }}'
 
     - name: Adding PostgresLogDb
       when: ((whisparr_xml_postgreslogdb.matches[0].PostgresLogDb is not defined) or
-             (whisparr_xml_postgreslogdb.matches[0].PostgresLogDb != lookup("vars", role_prefix + "_postgres_database_log") ))
+             (whisparr_xml_postgreslogdb.matches[0].PostgresLogDb != lookup("vars", whisparr_prefix + "_postgres_database_log") ))
       community.general.xml:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/config.xml'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/config.xml'
         pretty_print: true
         xpath: /Config/PostgresLogDb
-        value: '{{ lookup("vars", role_prefix + "_postgres_database_log") }}'
+        value: '{{ lookup("vars", whisparr_prefix + "_postgres_database_log") }}'
 
 - name: Clean appdir
   block:
     - name: Remove sqlite database files
-      when: (lookup("vars", role_prefix + "_toggles_clean_files"))
+      when: (lookup("vars", whisparr_prefix + "_toggles_clean_files"))
       ansible.builtin.file:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/{{ item }}'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/{{ item }}'
         state: absent
       loop:
         - logs.db
@@ -116,7 +116,7 @@
         - whisparr.db-wal
 
     - name: Remove sqlite backups folder
-      when: (lookup("vars", role_prefix + "_toggles_clean_folders"))
+      when: (lookup("vars", whisparr_prefix + "_toggles_clean_folders"))
       ansible.builtin.file:
-        path: '{{ lookup("vars", role_prefix + "_paths_location") }}/Backups'
+        path: '{{ lookup("vars", whisparr_prefix + "_paths_location") }}/Backups'
         state: absent

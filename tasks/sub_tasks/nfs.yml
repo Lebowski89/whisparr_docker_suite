@@ -1,10 +1,10 @@
 ---
 
 - name: Perform autofs mount tasks
-  when: (lookup("vars", role_prefix + "_toggles_enable_nfs_autofs"))
+  when: (lookup("vars", whisparr_prefix + "_toggles_enable_nfs_autofs"))
   block:
     - name: Autofs builtin fail
-      when: not (lookup("vars", role_prefix + "_autofs_mount_is_enabled"))
+      when: not (lookup("vars", whisparr_prefix + "_autofs_mount_is_enabled"))
       ansible.builtin.fail:
         msg: Autofs is toggled on but one or more NFS Autofs variables are empty
 
@@ -25,43 +25,43 @@
 
     - name: Append desired local mount path to autofs auto.master file
       ansible.builtin.lineinfile:
-        dest: '{{ lookup("vars", role_prefix + "_autofs_auto_mast_file") }}'
-        line: '{{ lookup("vars", role_prefix + "_autofs_nfs_local_path") }} {{ lookup("vars", role_prefix + "_autofs_nfsdb_file") }} --timeout=0 --browse'
+        dest: '{{ lookup("vars", whisparr_prefix + "_autofs_auto_mast_file") }}'
+        line: '{{ lookup("vars", whisparr_prefix + "_autofs_nfs_local_path") }} {{ lookup("vars", whisparr_prefix + "_autofs_nfsdb_file") }} --timeout=0 --browse'
         state: present
         create: true
-        owner: '{{ lookup("vars", role_prefix + "_nfs_env_puid") }}'
-        group: '{{ lookup("vars", role_prefix + "_nfs_env_pgid") }}'
+        owner: '{{ lookup("vars", whisparr_prefix + "_nfs_env_puid") }}'
+        group: '{{ lookup("vars", whisparr_prefix + "_nfs_env_pgid") }}'
         mode: '0644'
       notify:
         - redo mounts
 
     - name: Add mount to auto.nfsdb file
       ansible.builtin.lineinfile:
-        dest: '{{ lookup("vars", role_prefix + "_autofs_nfsdb_file") }}'
-        line: '{{ lookup("vars", role_prefix + "_autofs_mount_local_dir_name") }} {{ lookup("vars", role_prefix + "_autofs_mount_opt") }} {{ lookup("vars", role_prefix + "_autofs_mount_host_address") }}:{{ lookup("vars", role_prefix + "_autofs_mount_remote_path") }}'
+        dest: '{{ lookup("vars", whisparr_prefix + "_autofs_nfsdb_file") }}'
+        line: '{{ lookup("vars", whisparr_prefix + "_autofs_mount_local_dir_name") }} {{ lookup("vars", whisparr_prefix + "_autofs_mount_opt") }} {{ lookup("vars", whisparr_prefix + "_autofs_mount_host_address") }}:{{ lookup("vars", whisparr_prefix + "_autofs_mount_remote_path") }}'
         state: present
         create: true
-        owner: '{{ lookup("vars", role_prefix + "_nfs_env_puid") }}'
-        group: '{{ lookup("vars", role_prefix + "_nfs_env_pgid") }}'
+        owner: '{{ lookup("vars", whisparr_prefix + "_nfs_env_puid") }}'
+        group: '{{ lookup("vars", whisparr_prefix + "_nfs_env_pgid") }}'
         mode: '0644'
       notify:
         - redo mounts
 
 - name: Create nfs volume
-  when: (lookup("vars", role_prefix + "_toggles_enable_nfs_volume"))
+  when: (lookup("vars", whisparr_prefix + "_toggles_enable_nfs_volume"))
   block:
     - name: Autofs builtin fail
-      when: not (lookup("vars", role_prefix + "_nfs_volume_is_enabled"))
+      when: not (lookup("vars", whisparr_prefix + "_nfs_volume_is_enabled"))
       ansible.builtin.fail:
         msg: NFS volume is toggled on but one or more NFS volume variables are empty
 
     - name: Create nfs volume
       community.docker.docker_volume:
-        volume_name: '{{ lookup("vars", role_prefix + "_nfs_volume_name") }}'
+        volume_name: '{{ lookup("vars", whisparr_prefix + "_nfs_volume_name") }}'
         state: present
         recreate: options-changed
         driver: local
         driver_options:
           type: nfs
-          o: 'addr={{ lookup("vars", role_prefix + "_nfs_volume_address") }},{{ lookup("vars", role_prefix + "_nfs_volume_permissions") }},nfsvers={{ lookup("vars", role_prefix + "_nfs_volume_version") }}'
-          device: '{{ lookup("vars", role_prefix + "_nfs_volume_device") }}'
+          o: 'addr={{ lookup("vars", whisparr_prefix + "_nfs_volume_address") }},{{ lookup("vars", whisparr_prefix + "_nfs_volume_permissions") }},nfsvers={{ lookup("vars", whisparr_prefix + "_nfs_volume_version") }}'
+          device: '{{ lookup("vars", whisparr_prefix + "_nfs_volume_device") }}'
